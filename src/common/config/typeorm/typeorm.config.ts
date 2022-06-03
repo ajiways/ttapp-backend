@@ -17,6 +17,7 @@ const getBaseConfigPart = (): PostgresConnectionOptions => ({
   namingStrategy: new SnakeNamingStrategy(),
   schema: 'public',
   logging: 'all',
+  migrationsRun: true,
   cli: {
     migrationsDir: 'src/migrations',
   },
