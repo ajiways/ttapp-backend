@@ -13,7 +13,10 @@ import { LoginDTO } from '../dto/login.dto';
 import { RegistrationDTO } from '../dto/registration.dto';
 import { AuthenticationService } from '../services/authentication.service';
 import { TokenResponse } from './common/token-response.interface';
-import { Request, Response } from 'express';
+import {
+  RequestInterface,
+  ResponseInterface,
+} from './common/requestResponse.interfaces';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -24,7 +27,7 @@ export class AuthenticationController {
   @Post('/login')
   async login(
     @Body() args: LoginDTO,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: ResponseInterface,
   ): Promise<Omit<TokenResponse, 'refreshToken'>> {
     const response = await this.authenticationService.login(args);
 
@@ -41,7 +44,7 @@ export class AuthenticationController {
   @Post('/registration')
   async registration(
     @Body() args: RegistrationDTO,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: ResponseInterface,
   ): Promise<Omit<TokenResponse, 'refreshToken'>> {
     const response = await this.authenticationService.register(args);
 
@@ -56,20 +59,22 @@ export class AuthenticationController {
 
   @HttpCode(200)
   @Get('/logout')
-  async logout(@Req() req: Request, @Res() res: Response): Promise<void> {
+  async logout(
+    @Req() req: RequestInterface,
+    @Res({ passthrough: true }) res: ResponseInterface,
+  ): Promise<void> {
     const refreshToken = req.headers['refreshToken'] as string | undefined;
 
     await this.authenticationService.logout(refreshToken);
 
     res.clearCookie('refreshToken');
-    res.json({ done: true });
   }
 
   @HttpCode(200)
   @Get('/refresh')
-  async refresh(@Req() req: Request): Promise<void> {
-    const refreshToken = req.headers['refreshToken'] as string | undefined;
-    const userId = req.headers['x-user-id'] as string | undefined;
+  async refresh(@Req() req: RequestInterface): Promise<void> {
+    const refreshToken = req.headers['refreshToken'];
+    const userId = req.headers['x-user-id'];
 
     await this.authenticationService.refresh(refreshToken, userId);
   }
