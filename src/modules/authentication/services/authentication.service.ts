@@ -55,7 +55,10 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       expiration: expirationString,
     };
 
-    const refreshToken = await this.jwtService.signAsync(payload);
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.env.REFRESH_AUTHENTICATION_TOKEN_SECRET,
+      expiresIn: this.configService.env.REFRESH_AUTHENTICATION_TOKEN_EXPIRES_IN,
+    });
 
     if (existingToken) {
       await this.refreshTokenService.save({
