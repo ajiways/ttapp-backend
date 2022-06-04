@@ -85,10 +85,6 @@ export abstract class AbstractService<T extends TEntityPrototype> {
           ...i,
         };
       }
-      // FIXME: temporary
-      // if (this.authorIdColumnName && !params.authorId) {
-      //   throw new Error('authorId parameter is required');
-      // }
       return {
         ...i,
         ...(this.createdAtColumnName
@@ -194,8 +190,6 @@ export abstract class AbstractService<T extends TEntityPrototype> {
       uniqueIds,
       results.map((e) => e.id!),
     );
-
-    console.log(ids);
 
     if (diff.length) {
       throw new NotFoundException(
