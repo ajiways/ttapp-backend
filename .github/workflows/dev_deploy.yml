@@ -22,7 +22,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: |
           cd /root/kswbtw/ttapp-backend
-          git checkout dev
-          git pull
-          docker compose up --build -d
+          docker build -f Dockerfile -t ttapp-backend:latest .
+          docker-compose up -d ttapp-backend
 
