@@ -39,7 +39,7 @@ export class AuthenticationService implements AuthenticationServiceInterface {
   private readonly refreshTokenService: RefreshTokenServiceInterface;
 
   async validateToken(token: TAuthenticationToken): Promise<UserEntity | null> {
-    const user = await this.usersService.findByIdOrNull(token.id);
+    const user = await this.usersService.findByIdNoError(token.id);
     return user ?? null;
   }
 
@@ -82,7 +82,7 @@ export class AuthenticationService implements AuthenticationServiceInterface {
 
   async login(dto: LoginDTO): Promise<TokenResponse> {
     const { login, password } = dto;
-    const user = await this.usersService.findOneWhere({ login });
+    const user = await this.usersService.findByLogin(login);
 
     if (!user) {
       throw new BadRequestException(`User does not exists`);
@@ -120,12 +120,16 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       throw new BadRequestException('User id refresh token was not provided');
     }
 
-    const existingToken = await this.refreshTokenService.findOneWhere({
+    let existingToken = await this.refreshTokenService.findByRefreshToken(
       refreshToken,
-    });
+    );
 
     if (!existingToken) {
-      throw new UnauthorizedException(`Token isn't valid`);
+      existingToken = await this.refreshTokenService.findByUserId(userId);
+
+      if (!existingToken) {
+        throw new UnauthorizedException(`Token isn't valid`);
+      }
     }
 
     const user = await this.usersService.findById(userId);
@@ -138,14 +142,14 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       throw new UnauthorizedException('To log out log in first');
     }
 
-    const existingToken = await this.refreshTokenService.findOneWhere({
+    const existingToken = await this.refreshTokenService.findByRefreshToken(
       refreshToken,
-    });
+    );
 
     if (!existingToken) {
       return;
     }
 
-    await this.refreshTokenService.deleteEntities([existingToken]);
+    await this.refreshTokenService.delete(existingToken);
   }
 }

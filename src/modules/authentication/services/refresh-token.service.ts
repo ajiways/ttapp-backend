@@ -46,4 +46,37 @@ export class RefreshTokenService
       manager,
     );
   }
+
+  async findByRefreshToken(
+    refreshToken: string,
+    manager: EntityManager | undefined,
+  ): Promise<RefreshTokenEntity | undefined> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return await this.findOneWhere({ refreshToken }, manager);
+  }
+
+  async findByUserId(
+    userId: string,
+    manager: EntityManager | undefined,
+  ): Promise<RefreshTokenEntity | undefined> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return await this.findOneWhere({ userId }, manager);
+  }
+
+  async delete(
+    entity: RefreshTokenEntity,
+    manager?: EntityManager,
+  ): Promise<boolean> {
+    if (!manager) {
+      return this.startTransaction((manager) => this.delete(entity, manager));
+    }
+
+    return await this.deleteEntities([entity], manager);
+  }
 }

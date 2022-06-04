@@ -69,12 +69,14 @@ export class AuthenticationController {
   async logout(
     @Req() req: RequestInterface,
     @Res({ passthrough: true }) res: ResponseInterface,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const refreshToken = req.cookies['refreshToken'];
 
     await this.authenticationService.logout(refreshToken);
 
     res.clearCookie('refreshToken');
+
+    return true;
   }
 
   @HttpCode(200)

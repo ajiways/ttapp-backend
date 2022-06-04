@@ -80,4 +80,26 @@ export class UserService
 
     return await this.deleteEntities([candidate], manager);
   }
+
+  async findByLogin(
+    login: string,
+    manager?: EntityManager,
+  ): Promise<UserEntity | undefined> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return await this.findOneWhere({ login }, manager);
+  }
+
+  async findByIdNoError(
+    id: string,
+    manager: EntityManager | undefined,
+  ): Promise<UserEntity | undefined> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return await this.findByIdOrNull(id, manager);
+  }
 }

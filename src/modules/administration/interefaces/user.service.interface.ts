@@ -9,4 +9,12 @@ export interface UserServiceInterface extends BaseServiceInterface<UserEntity> {
   update(dto: UpdateUserDTO, manager?: EntityManager): Promise<UserEntity>;
   findAll(manager?: EntityManager): Promise<UserEntity[]>;
   delete(id: string, manager?: EntityManager): Promise<boolean>;
+  findByLogin(
+    login: string,
+    manager?: EntityManager,
+  ): Promise<UserEntity | undefined>;
+  findByIdNoError(
+    id: string,
+    manager?: EntityManager,
+  ): Promise<UserEntity | undefined>;
 }
