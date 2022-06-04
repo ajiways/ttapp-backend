@@ -35,7 +35,9 @@ export class AuthenticationController {
 
     res.cookie('refreshToken', response.refreshToken, {
       httpOnly: true,
+      sameSite: 'none',
       domain: process.env.DEV_SERVER_URL,
+      expires: new Date(Date.now() + 3600 * 720),
     });
 
     return {
@@ -55,7 +57,9 @@ export class AuthenticationController {
     const response = await this.authenticationService.register(args);
 
     res.cookie('refreshToken', response.refreshToken, {
+      expires: new Date(Date.now() + 3600 * 720),
       httpOnly: true,
+      sameSite: 'none',
       domain: process.env.DEV_SERVER_URL,
     });
 
