@@ -51,7 +51,7 @@ export class AuthenticationController {
   ): Promise<Omit<TokenResponse, 'refreshToken'>> {
     const response = await this.authenticationService.register(args);
 
-    res.cookie('refreshToken', response.refreshToken);
+    res.cookie('refreshToken', response.refreshToken, { httpOnly: true });
 
     return {
       expiration: response.expiration,
