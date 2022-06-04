@@ -23,5 +23,5 @@ jobs:
       - run: |
           cd /root/kswbtw/ttapp-backend
           docker build -f Dockerfile -t ttapp-backend:latest .
-          docker-compose up -d ttapp-backend
+          docker compose up -d ttapp-backend
 
