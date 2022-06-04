@@ -17,12 +17,14 @@ import {
   RequestInterface,
   ResponseInterface,
 } from './common/requestResponse.interfaces';
+import { Public } from '../guards/authentication.guard';
 
 @Controller('auth')
 export class AuthenticationController {
   @Inject(AuthenticationService)
   private readonly authenticationService: AuthenticationServiceInterface;
 
+  @Public()
   @HttpCode(200)
   @Post('/login')
   async login(
@@ -40,6 +42,7 @@ export class AuthenticationController {
     };
   }
 
+  @Public()
   @HttpCode(201)
   @Post('/registration')
   async registration(
@@ -74,7 +77,7 @@ export class AuthenticationController {
   @Get('/refresh')
   async refresh(@Req() req: RequestInterface): Promise<void> {
     const refreshToken = req.headers['refreshToken'];
-    const userId = req.headers['x-user-id'];
+    const userId = req.user.id;
 
     await this.authenticationService.refresh(refreshToken, userId);
   }

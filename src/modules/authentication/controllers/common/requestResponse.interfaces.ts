@@ -1,4 +1,5 @@
 import { CookieOptions } from 'express';
+import { UserEntity } from '../../../administration/entities/user.entity';
 
 export interface RequestInterface {
   headers: {
@@ -6,6 +7,7 @@ export interface RequestInterface {
     Authorization: string | undefined;
     refreshToken: string | undefined;
   };
+  user: UserEntity;
 }
 
 export interface ResponseInterface {
