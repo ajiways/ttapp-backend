@@ -35,7 +35,7 @@ export class AuthenticationController {
 
     res.cookie('refreshToken', response.refreshToken, {
       httpOnly: true,
-      domain: 'http://localhost:3000',
+      domain: process.env.DEV_SERVER_URL,
     });
 
     return {
@@ -56,7 +56,7 @@ export class AuthenticationController {
 
     res.cookie('refreshToken', response.refreshToken, {
       httpOnly: true,
-      domain: 'http://localhost:3000',
+      domain: process.env.DEV_SERVER_URL,
     });
 
     return {
