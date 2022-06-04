@@ -19,7 +19,11 @@ async function bootstrap() {
 
   const config: ConfigurationService = app.get(ConfigurationService);
 
-  await app.listen(Number(config.env.APP_PORT), String(config.env.APP_HOST));
+  await app.listen(
+    Number(config.env.APP_PORT),
+    //FIXME: wtf
+    String(config.env.APP_HOST).replace('}', '').replace('{', ''),
+  );
   Logger.log(`Application is running on: ${await app.getUrl()}`);
 }
 
