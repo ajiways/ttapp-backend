@@ -1,4 +1,4 @@
-import { IsNumber, IsString, validateSync } from 'class-validator';
+import { IsInt, IsNumber, IsString, validateSync } from 'class-validator';
 import { registerAs } from '@nestjs/config';
 import { plainToClass, Transform } from 'class-transformer';
 
@@ -26,7 +26,24 @@ export class EnvironmentConfig {
   DB_PASS: string;
 
   @IsString()
-  APP_HOST: string;
+  APP_HOST = '0.0.0.0';
+
+  @Transform(({ value }: TTransformerValue) => (value ? +value : 1200))
+  @IsInt()
+  AUTHENTICATION_TOKEN_EXPIRES_IN!: number;
+
+  @IsString()
+  AUTHENTICATION_TOKEN_SECRET!: string;
+
+  @IsString()
+  REFRESH_AUTHENTICATION_TOKEN_SECRET!: string;
+
+  @Transform(({ value }: TTransformerValue) => (value ? +value : 86400))
+  @IsInt()
+  REFRESH_AUTHENTICATION_TOKEN_EXPIRES_IN!: number;
+
+  @IsString()
+  STAGE = 'DEV';
 }
 
 export default registerAs('env', function (): EnvironmentConfig {

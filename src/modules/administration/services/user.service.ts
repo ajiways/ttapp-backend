@@ -27,9 +27,9 @@ export class UserService
       return this.startTransaction((manager) => this.save(dto, manager));
     }
 
-    const candidates = await this.findWhere({ login: dto.login }, manager);
+    const candidates = await this.findOneWhere({ login: dto.login }, manager);
 
-    if (candidates.length) {
+    if (candidates) {
       throw new BadRequestException(
         `User with login ${dto.login} already exists`,
       );
@@ -79,5 +79,27 @@ export class UserService
     const candidate = await this.findById(id, manager);
 
     return await this.deleteEntities([candidate], manager);
+  }
+
+  async findByLogin(
+    login: string,
+    manager?: EntityManager,
+  ): Promise<UserEntity | undefined> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return await this.findOneWhere({ login }, manager);
+  }
+
+  async findByIdNoError(
+    id: string,
+    manager: EntityManager | undefined,
+  ): Promise<UserEntity | undefined> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return await this.findByIdOrNull(id, manager);
   }
 }

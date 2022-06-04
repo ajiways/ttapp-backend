@@ -85,10 +85,6 @@ export abstract class AbstractService<T extends TEntityPrototype> {
           ...i,
         };
       }
-      // FIXME: temporary
-      // if (this.authorIdColumnName && !params.authorId) {
-      //   throw new Error('authorId parameter is required');
-      // }
       return {
         ...i,
         ...(this.createdAtColumnName
@@ -264,6 +260,17 @@ export abstract class AbstractService<T extends TEntityPrototype> {
     }
 
     return entity;
+  }
+
+  async findByIdOrNull(
+    id: string,
+    manager?: EntityManager | undefined,
+  ): Promise<T | undefined> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return this.findOneWhere({ id }, manager);
   }
 
   protected findWhereParams(
