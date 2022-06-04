@@ -79,10 +79,23 @@ export class AuthenticationController {
 
   @HttpCode(200)
   @Get('/refresh')
-  async refresh(@Req() req: RequestInterface): Promise<void> {
+  async refresh(
+    @Req() req: RequestInterface,
+    @Res({ passthrough: true }) res: ResponseInterface,
+  ): Promise<Omit<TokenResponse, 'refreshToken' | 'userId'>> {
     const refreshToken = req.cookies['refreshToken'];
     const userId = req.user.id;
 
-    await this.authenticationService.refresh(refreshToken, userId);
+    const result = await this.authenticationService.refresh(
+      refreshToken,
+      userId,
+    );
+
+    res.cookie('refreshToken', result.refreshToken);
+
+    return {
+      expiration: result.expiration,
+      token: result.token,
+    };
   }
 }

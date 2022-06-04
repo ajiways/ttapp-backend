@@ -114,6 +114,7 @@ export class AuthenticationService implements AuthenticationServiceInterface {
     expiration: string;
     userId: string;
     token: string;
+    refreshToken: string;
   }> {
     if (!refreshToken || !userId) {
       throw new BadRequestException('User id refresh token was not provided');
@@ -127,11 +128,7 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       throw new UnauthorizedException(`Token isn't valid`);
     }
 
-    const decodedData = this.jwtService.decode(refreshToken) as {
-      userId: string;
-    };
-
-    const user = await this.usersService.findById(decodedData.userId);
+    const user = await this.usersService.findById(userId);
 
     return await this.generateToken(user, existingToken);
   }

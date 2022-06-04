@@ -17,6 +17,7 @@ export interface AuthenticationServiceInterface {
     expiration: string;
     userId: string;
     token: string;
+    refreshToken: string;
   }>;
   logout(
     refreshToken: string | undefined,
