@@ -14,10 +14,10 @@ const settingsObj = {
 
 if (process.env.STAGE === 'PROD') {
   settingsObj.entities = [join(process.cwd(), '/**/*.entity.js')];
-  settingsObj.cli.migrationsDir = `${join(process.cwd())}/migrations`;
+  settingsObj.cli.migrationsDir = `${join(process.cwd())}/**/migrations`;
   settingsObj.migrations = [
-    `${join(process.cwd())}/migrations/*.js`,
-    `${join(process.cwd())}/seeds/*.js`,
+    `${join(process.cwd())}/**/migrations/*.js`,
+    `${join(process.cwd())}/**/seeds/*.js`,
   ];
 }
 

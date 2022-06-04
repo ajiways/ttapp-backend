@@ -26,7 +26,7 @@ export class EnvironmentConfig {
   DB_PASS: string;
 
   @IsString()
-  APP_HOST: string;
+  APP_HOST = '0.0.0.0';
 
   @Transform(({ value }: TTransformerValue) => (value ? +value : 1200))
   @IsInt()
