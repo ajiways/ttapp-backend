@@ -195,6 +195,8 @@ export abstract class AbstractService<T extends TEntityPrototype> {
       results.map((e) => e.id!),
     );
 
+    console.log(ids);
+
     if (diff.length) {
       throw new NotFoundException(
         `One or more entities does not exist (${this.Entity.name})`,

@@ -6,10 +6,17 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigurationService } from '../../common/configuration/configuration.service';
 import { AdministrationModule } from '../administration/administration.module';
 import { RefreshTokenService } from './services/refresh-token.service';
+import { AuthenticationGuard } from './guards/authentication.guard';
+import { AuthenticationStrategy } from './authentication.strategy';
 
 const modules = [AdministrationModule];
 
-const services = [AuthenticationService, RefreshTokenService];
+const services = [
+  AuthenticationService,
+  RefreshTokenService,
+  AuthenticationGuard,
+  AuthenticationStrategy,
+];
 
 @Module({
   imports: [

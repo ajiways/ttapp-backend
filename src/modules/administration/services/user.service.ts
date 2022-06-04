@@ -27,9 +27,9 @@ export class UserService
       return this.startTransaction((manager) => this.save(dto, manager));
     }
 
-    const candidates = await this.findWhere({ login: dto.login }, manager);
+    const candidates = await this.findOneWhere({ login: dto.login }, manager);
 
-    if (candidates.length) {
+    if (candidates) {
       throw new BadRequestException(
         `User with login ${dto.login} already exists`,
       );

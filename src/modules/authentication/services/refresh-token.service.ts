@@ -23,7 +23,6 @@ export class RefreshTokenService
       entities.map((i) => {
         if (!i.userId)
           throw new InternalServerErrorException('No user for refresh token');
-
         return i.userId;
       }),
       manager,

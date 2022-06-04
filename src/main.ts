@@ -9,6 +9,8 @@ async function bootstrap() {
   app.enableCors({ origin: '*', credentials: true });
   app.use(cookieParser());
 
+  app.useGlobalGuards(app.get('AuthenticationGuard'));
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

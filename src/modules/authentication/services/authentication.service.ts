@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
-import { Connection, EntityManager } from 'typeorm';
 import { ConfigurationService } from '../../../common/configuration/configuration.service';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { UserService } from '../../administration/services/user.service';
@@ -16,6 +15,8 @@ import { LoginDTO } from '../dto/login.dto';
 import { RegistrationDTO } from '../dto/registration.dto';
 import { RefreshTokenEntity } from '../entities/refresh-token.entity';
 import { RefreshTokenService } from './refresh-token.service';
+import { UserServiceInterface } from '../../administration/interefaces/user.service.interface';
+import { RefreshTokenServiceInterface } from '../interfaces/refresh-token.service.interface';
 
 export type TAuthenticationToken = {
   id: string;
@@ -25,8 +26,8 @@ export type TAuthenticationToken = {
 
 @Injectable()
 export class AuthenticationService implements AuthenticationServiceInterface {
-  @Inject()
-  private usersService: UserService;
+  @Inject(UserService)
+  private usersService: UserServiceInterface;
 
   @Inject()
   private configService: ConfigurationService;
@@ -34,11 +35,8 @@ export class AuthenticationService implements AuthenticationServiceInterface {
   @Inject()
   private jwtService: JwtService;
 
-  @Inject()
-  private readonly connection: Connection;
-
-  @Inject()
-  private readonly refreshTokenService: RefreshTokenService;
+  @Inject(RefreshTokenService)
+  private readonly refreshTokenService: RefreshTokenServiceInterface;
 
   async validateToken(token: TAuthenticationToken): Promise<UserEntity | null> {
     const user = await this.usersService.findByIdOrNull(token.id);
@@ -50,7 +48,7 @@ export class AuthenticationService implements AuthenticationServiceInterface {
     const now = Date.now();
     const expiration = new Date(now + expiresIn * 1000);
     const expirationString = expiration.toISOString();
-    const userId = user.id!;
+    const userId = user.id;
     const payload: TAuthenticationToken = {
       id: userId,
       login: user.login,
@@ -60,15 +58,13 @@ export class AuthenticationService implements AuthenticationServiceInterface {
     const refreshToken = await this.jwtService.signAsync(payload);
 
     if (existingToken) {
-      await this.refreshTokenService.save(
-        { id: existingToken.id, user, refreshToken },
-        this.connection.manager,
-      );
+      await this.refreshTokenService.save({
+        id: existingToken.id,
+        user,
+        refreshToken,
+      });
     } else {
-      await this.refreshTokenService.save(
-        { refreshToken, user },
-        this.connection.manager,
-      );
+      await this.refreshTokenService.save({ refreshToken, user });
     }
 
     const token = await this.jwtService.signAsync(payload);
@@ -81,16 +77,9 @@ export class AuthenticationService implements AuthenticationServiceInterface {
     };
   }
 
-  async login(
-    dto: LoginDTO,
-    manager: EntityManager | undefined,
-  ): Promise<TokenResponse> {
-    if (!manager) {
-      return this.connection.transaction((manager) => this.login(dto, manager));
-    }
-
+  async login(dto: LoginDTO): Promise<TokenResponse> {
     const { login, password } = dto;
-    const user = await this.usersService.findOneWhere({ login }, manager);
+    const user = await this.usersService.findOneWhere({ login });
 
     if (!user) {
       throw new BadRequestException(`User does not exists`);
@@ -105,21 +94,12 @@ export class AuthenticationService implements AuthenticationServiceInterface {
     }
   }
 
-  async register(
-    dto: RegistrationDTO,
-    manager?: EntityManager,
-  ): Promise<TokenResponse> {
-    if (!manager) {
-      return this.connection.transaction((manager) =>
-        this.register(dto, manager),
-      );
-    }
-
+  async register(dto: RegistrationDTO): Promise<TokenResponse> {
     if (dto.password !== dto.confirmPassword) {
       throw new BadRequestException(`Password and password confirm mismatches`);
     }
 
-    const user = await this.usersService.save(dto, manager);
+    const user = await this.usersService.save(dto);
 
     return await this.generateToken(user);
   }
@@ -127,7 +107,6 @@ export class AuthenticationService implements AuthenticationServiceInterface {
   async refresh(
     refreshToken: string | undefined,
     userId: string | undefined,
-    manager: EntityManager | undefined,
   ): Promise<{
     expiration: string;
     userId: string;
@@ -137,18 +116,9 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       throw new BadRequestException('User id refresh token was not provided');
     }
 
-    if (!manager) {
-      return this.connection.transaction((manager) =>
-        this.refresh(refreshToken, userId, manager),
-      );
-    }
-
-    const existingToken = await this.refreshTokenService.findOneWhere(
-      {
-        refreshToken,
-      },
-      manager,
-    );
+    const existingToken = await this.refreshTokenService.findOneWhere({
+      refreshToken,
+    });
 
     if (!existingToken) {
       throw new UnauthorizedException(`Token isn't valid`);
@@ -158,34 +128,24 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       userId: string;
     };
 
-    const user = await this.usersService.findById(decodedData.userId, manager);
+    const user = await this.usersService.findById(decodedData.userId);
 
     return await this.generateToken(user, existingToken);
   }
 
-  async logout(
-    refreshToken: string | undefined,
-    manager: EntityManager | undefined,
-  ): Promise<void> {
-    if (!manager) {
-      manager = this.connection.manager;
-    }
-
+  async logout(refreshToken: string | undefined): Promise<void> {
     if (!refreshToken) {
       throw new UnauthorizedException('To log out log in first');
     }
 
-    const existingToken = await this.refreshTokenService.findOneWhere(
-      {
-        refreshToken,
-      },
-      manager,
-    );
+    const existingToken = await this.refreshTokenService.findOneWhere({
+      refreshToken,
+    });
 
     if (!existingToken) {
       return;
     }
 
-    await this.refreshTokenService.deleteEntities([existingToken], manager);
+    await this.refreshTokenService.deleteEntities([existingToken]);
   }
 }
