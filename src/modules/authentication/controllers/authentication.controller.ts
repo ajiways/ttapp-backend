@@ -33,7 +33,10 @@ export class AuthenticationController {
   ): Promise<Omit<TokenResponse, 'refreshToken'>> {
     const response = await this.authenticationService.login(args);
 
-    res.cookie('refreshToken', response.refreshToken);
+    res.cookie('refreshToken', response.refreshToken, {
+      httpOnly: true,
+      domain: 'http://localhost:3000',
+    });
 
     return {
       expiration: response.expiration,
@@ -51,7 +54,10 @@ export class AuthenticationController {
   ): Promise<Omit<TokenResponse, 'refreshToken'>> {
     const response = await this.authenticationService.register(args);
 
-    res.cookie('refreshToken', response.refreshToken, { httpOnly: true });
+    res.cookie('refreshToken', response.refreshToken, {
+      httpOnly: true,
+      domain: 'http://localhost:3000',
+    });
 
     return {
       expiration: response.expiration,
@@ -66,7 +72,7 @@ export class AuthenticationController {
     @Req() req: RequestInterface,
     @Res({ passthrough: true }) res: ResponseInterface,
   ): Promise<void> {
-    const refreshToken = req.headers['refreshToken'] as string | undefined;
+    const refreshToken = req.cookies['refreshToken'];
 
     await this.authenticationService.logout(refreshToken);
 
@@ -76,7 +82,7 @@ export class AuthenticationController {
   @HttpCode(200)
   @Get('/refresh')
   async refresh(@Req() req: RequestInterface): Promise<void> {
-    const refreshToken = req.headers['refreshToken'];
+    const refreshToken = req.cookies['refreshToken'];
     const userId = req.user.id;
 
     await this.authenticationService.refresh(refreshToken, userId);

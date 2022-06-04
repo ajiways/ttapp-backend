@@ -7,6 +7,9 @@ export interface RequestInterface {
     Authorization: string | undefined;
     refreshToken: string | undefined;
   };
+  cookies: {
+    refreshToken: string | undefined;
+  };
   user: UserEntity;
 }
 
