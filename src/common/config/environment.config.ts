@@ -44,6 +44,9 @@ export class EnvironmentConfig {
 
   @IsString()
   STAGE = 'DEV';
+
+  @IsString()
+  FRONTEND_URL!: string;
 }
 
 export default registerAs('env', function (): EnvironmentConfig {
