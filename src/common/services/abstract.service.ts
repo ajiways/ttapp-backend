@@ -266,6 +266,17 @@ export abstract class AbstractService<T extends TEntityPrototype> {
     return entity;
   }
 
+  async findByIdOrNull(
+    id: string,
+    manager?: EntityManager | undefined,
+  ): Promise<T | undefined> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return this.findOneWhere({ id }, manager);
+  }
+
   protected findWhereParams(
     conditions: FindConditions<T> | FindConditions<T>[],
     extra: TFindExtraParams<T> = {},
