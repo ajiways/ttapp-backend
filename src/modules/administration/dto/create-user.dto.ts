@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID, Length, Matches } from 'class-validator';
 import { Complete } from '../../../common/helpers/dto';
 import { UserEntity } from '../entities/user.entity';
 
@@ -15,4 +15,7 @@ export class CreateUserDTO implements Complete<UserEntity> {
   @Matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/)
   @Length(8, 32)
   password: string;
+
+  @IsUUID('4')
+  groupId: string;
 }
