@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Inject, Patch } from '@nestjs/common';
 import { EntityIdDTO } from '../../../common/entity/entity-id.dto';
+import { Public } from '../../authentication/guards/authentication.guard';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
 import { GroupEntity } from '../entity/group.entity';
 import {
@@ -13,6 +14,7 @@ export class GroupController {
   @Inject(GroupService)
   private readonly groupService: GroupSeviceInterface;
 
+  @Public()
   @Get('/list')
   async getGroupList(): Promise<GroupList> {
     return await this.groupService.groupList();
