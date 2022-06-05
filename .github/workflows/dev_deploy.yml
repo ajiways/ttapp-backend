@@ -24,5 +24,6 @@ jobs:
           git pull
           docker build -f Dockerfile -t ttapp-backend:latest .
           docker compose up -d --force-recreate ttapp-backend
-          docker compose up -d --force-recreate ttapp-backend
+          docker image rm $(docker image ls -a -q)
+
 
