@@ -1,7 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { hash } from 'bcrypt';
 import { EntityManager } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
+import { GroupService } from '../../group/services/group.service';
+import { StudentGroupService } from '../../group/services/student-group.service';
 import { CreateUserDTO } from '../dto/create-user.dto';
 import { UpdateUserDTO } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
@@ -15,14 +22,20 @@ export class UserService
   protected Entity = UserEntity;
   protected deletedAtColumnName: string | null = 'deletedAt';
 
+  @Inject(forwardRef(() => GroupService))
+  private readonly groupService: GroupService;
+
+  @Inject()
+  private readonly studentGroupService: StudentGroupService;
+
   protected async validateEntitiesBeforeSave(): Promise<void> {
-    //TODO: nothing to do
+    //TODO: Nothing to do
   }
 
   async save(
     dto: CreateUserDTO,
     manager: EntityManager | undefined,
-  ): Promise<UserEntity> {
+  ): Promise<UserEntity & { groupId: string }> {
     if (!manager) {
       return this.startTransaction((manager) => this.save(dto, manager));
     }
@@ -35,13 +48,25 @@ export class UserService
       );
     }
 
-    return await this.saveEntity(
+    const user = await this.saveEntity(
       {
         login: dto.login,
         password: await hash(dto.password, 7),
       },
       manager,
     );
+
+    const group = await this.groupService.findById(dto.groupId, manager);
+
+    await this.studentGroupService.save(
+      {
+        groupId: group.id,
+        studentId: user.id,
+      },
+      manager,
+    );
+
+    return { ...user, groupId: group.id };
   }
 
   async update(

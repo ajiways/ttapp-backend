@@ -25,6 +25,10 @@ export class UpdateUserDTO implements CompleteToUpdate<UserEntity> {
   @Length(8, 32)
   password?: string | undefined;
 
+  @IsOptional()
+  @IsUUID('4')
+  groupId: string | undefined;
+
   @IsUUID('4')
   id: string;
 }

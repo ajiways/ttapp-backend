@@ -8,7 +8,7 @@ export interface AuthenticationServiceInterface {
   register(
     dto: RegistrationDTO,
     manager?: EntityManager,
-  ): Promise<TokenResponse>;
+  ): Promise<TokenResponse & { groupId: string }>;
   refresh(
     refreshToken: string | undefined,
     userId: string | undefined,

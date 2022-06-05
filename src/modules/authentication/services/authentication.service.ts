@@ -97,14 +97,21 @@ export class AuthenticationService implements AuthenticationServiceInterface {
     }
   }
 
-  async register(dto: RegistrationDTO): Promise<TokenResponse> {
+  async register(
+    dto: RegistrationDTO,
+  ): Promise<TokenResponse & { groupId: string }> {
     if (dto.password !== dto.confirmPassword) {
       throw new BadRequestException(`Password and password confirm mismatches`);
     }
 
     const user = await this.usersService.save(dto);
 
-    return await this.generateToken(user);
+    const tokenData = await this.generateToken(user);
+
+    return {
+      ...tokenData,
+      groupId: user.groupId,
+    };
   }
 
   async refresh(

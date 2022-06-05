@@ -1,6 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
+import { UserService } from '../../administration/services/user.service';
 import { SaveGroupDTO } from '../dto/save-group.dto';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
 import { GroupEntity } from '../entity/group.entity';
@@ -16,11 +23,24 @@ export class GroupService
 {
   protected Entity = GroupEntity;
 
+  @Inject(forwardRef(() => UserService))
+  private readonly userService: UserService;
+
   protected async validateEntitiesBeforeSave(
     entities: Partial<GroupEntity>[],
     manager: EntityManager,
   ): Promise<void> {
-    //TODO: Implement.
+    await this.userService.findByIds(
+      entities.map((entity) => {
+        if (!entity.headmanId) {
+          throw new InternalServerErrorException(
+            `No headman was passed to the group ${entity.title}`,
+          );
+        }
+        return entity.headmanId;
+      }),
+      manager,
+    );
   }
 
   async save(

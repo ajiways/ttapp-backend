@@ -39,5 +39,6 @@ const services = [
   ],
   controllers: [AuthenticationController],
   providers: [...services],
+  exports: [...services],
 })
 export class AuthenticationModule {}

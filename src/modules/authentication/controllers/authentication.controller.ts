@@ -50,7 +50,7 @@ export class AuthenticationController {
   async registration(
     @Body() args: RegistrationDTO,
     @Res({ passthrough: true }) res: ResponseInterface,
-  ): Promise<Omit<TokenResponse, 'refreshToken'>> {
+  ): Promise<Omit<TokenResponse, 'refreshToken'> & { groupId: string }> {
     const response = await this.authenticationService.register(args);
 
     res.cookie('refreshToken', response.refreshToken, {
@@ -61,6 +61,7 @@ export class AuthenticationController {
       expiration: response.expiration,
       token: response.token,
       userId: response.userId,
+      groupId: response.groupId,
     };
   }
 
