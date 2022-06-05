@@ -11,6 +11,7 @@ import { ConfigurationService } from '../common/configuration/configuration.serv
 import { AdministrationModule } from './administration/administration.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { GroupModule } from './group/group.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { GroupModule } from './group/group.module';
     AuthenticationModule,
     GroupModule,
   ],
+  controllers: [AppController],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: IncomingRequestInterceptor },
   ],
