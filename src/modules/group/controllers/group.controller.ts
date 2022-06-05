@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Inject, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Patch,
+} from '@nestjs/common';
 import { EntityIdDTO } from '../../../common/entity/entity-id.dto';
 import { Public } from '../../authentication/guards/authentication.guard';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
@@ -20,8 +28,8 @@ export class GroupController {
     return await this.groupService.groupList();
   }
 
-  @Get()
-  async getOneGroup(@Body() dto: EntityIdDTO): Promise<GroupEntity> {
+  @Get(':id')
+  async getOneGroup(@Param() dto: EntityIdDTO): Promise<GroupEntity> {
     return await this.groupService.findById(dto.id);
   }
 
