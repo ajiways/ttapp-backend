@@ -34,10 +34,11 @@ export class UserService
 
   async save(
     dto: CreateUserDTO,
+    user: UserEntity,
     manager: EntityManager | undefined,
   ): Promise<UserEntity & { groupId: string }> {
     if (!manager) {
-      return this.startTransaction((manager) => this.save(dto, manager));
+      return this.startTransaction((manager) => this.save(dto, user, manager));
     }
 
     const candidates = await this.findOneWhere({ login: dto.login }, manager);
@@ -48,10 +49,11 @@ export class UserService
       );
     }
 
-    const user = await this.saveEntity(
+    const savedUser = await this.saveEntity(
       {
         login: dto.login,
         password: await hash(dto.password, 7),
+        creatorId: user.id,
       },
       manager,
     );
@@ -61,20 +63,24 @@ export class UserService
     await this.studentGroupService.save(
       {
         groupId: group.id,
-        studentId: user.id,
+        studentId: savedUser.id,
       },
+      user,
       manager,
     );
 
-    return { ...user, groupId: group.id };
+    return { ...savedUser, groupId: group.id };
   }
 
   async update(
     dto: UpdateUserDTO,
+    user: UserEntity,
     manager?: EntityManager,
   ): Promise<UserEntity> {
     if (!manager) {
-      return this.startTransaction((manager) => this.update(dto, manager));
+      return this.startTransaction((manager) =>
+        this.update(dto, user, manager),
+      );
     }
 
     const existingUser = await this.findById(dto.id, manager);
@@ -83,6 +89,7 @@ export class UserService
       {
         ...existingUser,
         ...dto,
+        editorId: user.id,
       },
       manager,
     );
@@ -96,12 +103,17 @@ export class UserService
     return await this.findWhere({}, manager);
   }
 
-  async delete(id: string, manager?: EntityManager): Promise<boolean> {
+  async delete(
+    id: string,
+    user: UserEntity,
+    manager?: EntityManager,
+  ): Promise<boolean> {
     if (!manager) {
-      return this.startTransaction((manager) => this.delete(id, manager));
+      return this.startTransaction((manager) => this.delete(id, user, manager));
     }
 
     const candidate = await this.findById(id, manager);
+    candidate.deleterId = user.id;
 
     return await this.deleteEntities([candidate], manager);
   }

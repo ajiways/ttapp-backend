@@ -7,15 +7,29 @@ import { UserEntity } from '../entities/user.entity';
 export interface UserServiceInterface extends BaseServiceInterface<UserEntity> {
   save(
     dto: CreateUserDTO,
+    user?: UserEntity,
     manager?: EntityManager,
   ): Promise<UserEntity & { groupId: string }>;
-  update(dto: UpdateUserDTO, manager?: EntityManager): Promise<UserEntity>;
+
+  update(
+    dto: UpdateUserDTO,
+    user: UserEntity,
+    manager?: EntityManager,
+  ): Promise<UserEntity>;
+
   findAll(manager?: EntityManager): Promise<UserEntity[]>;
-  delete(id: string, manager?: EntityManager): Promise<boolean>;
+
+  delete(
+    id: string,
+    user: UserEntity,
+    manager?: EntityManager,
+  ): Promise<boolean>;
+
   findByLogin(
     login: string,
     manager?: EntityManager,
   ): Promise<UserEntity | undefined>;
+
   findByIdNoError(
     id: string,
     manager?: EntityManager,

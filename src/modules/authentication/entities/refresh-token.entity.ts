@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { EditedEntity } from '../../../common/config/created.entity';
+import { EditedEntity } from '../../../common/helpers/created.entity';
 import { UserEntity } from '../../administration/entities/user.entity';
 
 @Entity('refresh_tokens')

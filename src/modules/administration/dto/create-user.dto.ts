@@ -2,7 +2,9 @@ import { IsNotEmpty, IsString, IsUUID, Length, Matches } from 'class-validator';
 import { Complete } from '../../../common/helpers/dto';
 import { UserEntity } from '../entities/user.entity';
 
-export class CreateUserDTO implements Complete<UserEntity> {
+export class CreateUserDTO
+  implements Complete<Omit<UserEntity, 'studentGroupId'>>
+{
   @IsString()
   @Length(4, 16)
   @Matches(/(?!-)(?!.*__)(?!.*-_)(?!.*_-)(?!.*--)^[_a-zA-Z0-9-]+$/)

@@ -29,7 +29,7 @@ const services = [
         return {
           secret: AUTHENTICATION_TOKEN_SECRET,
           signOptions: {
-            expiresIn: AUTHENTICATION_TOKEN_EXPIRES_IN,
+            expiresIn: AUTHENTICATION_TOKEN_EXPIRES_IN * 1000,
           },
         };
       },
