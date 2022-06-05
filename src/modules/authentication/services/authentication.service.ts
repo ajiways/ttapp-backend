@@ -127,6 +127,20 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       throw new BadRequestException('User id refresh token was not provided');
     }
 
+    try {
+      await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.env.REFRESH_AUTHENTICATION_TOKEN_SECRET,
+      });
+    } catch (e) {
+      const existingToken = await this.refreshTokenService.findByUserId(userId);
+
+      if (existingToken) {
+        await this.refreshTokenService.delete(existingToken);
+      }
+
+      throw new UnauthorizedException(`Refresh token is expired`);
+    }
+
     let existingToken = await this.refreshTokenService.findByRefreshToken(
       refreshToken,
     );

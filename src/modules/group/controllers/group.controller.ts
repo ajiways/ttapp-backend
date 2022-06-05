@@ -7,7 +7,9 @@ import {
   Param,
   Patch,
 } from '@nestjs/common';
-import { EntityIdDTO } from '../../../common/entity/entity-id.dto';
+import { EntityIdDTO } from '../../../common/helpers/entity/entity-id.dto';
+import { UserRequest } from '../../../common/user-request';
+import { UserEntity } from '../../administration/entities/user.entity';
 import { Public } from '../../authentication/guards/authentication.guard';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
 import { GroupEntity } from '../entity/group.entity';
@@ -35,12 +37,18 @@ export class GroupController {
   }
 
   @Patch()
-  async updateGroup(@Body() dto: UpdateGroupDTO): Promise<GroupEntity> {
-    return await this.groupService.update(dto);
+  async updateGroup(
+    @Body() dto: UpdateGroupDTO,
+    @UserRequest() user: UserEntity,
+  ): Promise<GroupEntity> {
+    return await this.groupService.update(dto, user);
   }
 
   @Delete()
-  async deleteGroup(@Body() dto: EntityIdDTO): Promise<boolean> {
-    return await this.groupService.delete(dto.id);
+  async deleteGroup(
+    @Body() dto: EntityIdDTO,
+    @UserRequest() user: UserEntity,
+  ): Promise<boolean> {
+    return await this.groupService.delete(dto.id, user);
   }
 }

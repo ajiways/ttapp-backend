@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
+import { UserEntity } from '../../administration/entities/user.entity';
 import { UserService } from '../../administration/services/user.service';
 import { SaveGroupDTO } from '../dto/save-group.dto';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
@@ -22,6 +23,7 @@ export class GroupService
   implements GroupSeviceInterface
 {
   protected Entity = GroupEntity;
+  protected deletedAtColumnName: string | null = 'deletedAt';
 
   @Inject(forwardRef(() => UserService))
   private readonly userService: UserService;
@@ -45,10 +47,11 @@ export class GroupService
 
   async save(
     dto: SaveGroupDTO,
+    user: UserEntity,
     manager: EntityManager | undefined,
   ): Promise<GroupEntity> {
     if (!manager) {
-      return this.startTransaction((manager) => this.save(dto, manager));
+      return this.startTransaction((manager) => this.save(dto, user, manager));
     }
 
     const candidate = await this.findOneWhere({ title: dto.title }, manager);
@@ -59,7 +62,7 @@ export class GroupService
       );
     }
 
-    return await this.saveEntity(dto, manager);
+    return await this.saveEntity({ ...dto, creatorId: user.id }, manager);
   }
 
   async groupList(manager: EntityManager | undefined): Promise<GroupList> {
@@ -79,23 +82,28 @@ export class GroupService
 
   async delete(
     id: string,
+    user: UserEntity,
     manager: EntityManager | undefined,
   ): Promise<boolean> {
     if (!manager) {
-      return this.startTransaction((manager) => this.delete(id, manager));
+      return this.startTransaction((manager) => this.delete(id, user, manager));
     }
 
     const toDelete = await this.findById(id, manager);
+    toDelete.deleterId = user.id;
 
     return await this.deleteEntities([toDelete], manager);
   }
 
   async update(
     dto: UpdateGroupDTO,
+    user: UserEntity,
     manager?: EntityManager,
   ): Promise<GroupEntity> {
     if (!manager) {
-      return this.startTransaction((manager) => this.update(dto, manager));
+      return this.startTransaction((manager) =>
+        this.update(dto, user, manager),
+      );
     }
 
     const toUpdate = await this.findById(dto.id, manager);
@@ -104,6 +112,7 @@ export class GroupService
       {
         ...toUpdate,
         ...dto,
+        editorId: user.id,
       },
       manager,
     );

@@ -4,9 +4,11 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   UpdateDateColumn,
 } from 'typeorm';
 import { dateTransformer } from '../../../common/typeorm/date-transformer';
+import { GroupEntity } from '../../group/entity/group.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -60,6 +62,9 @@ export class UserEntity {
   })
   creatorId: string;
 
+  @Column({ type: 'uuid', nullable: false })
+  groupId: string;
+
   // Related entities
   @ManyToOne(() => UserEntity, { nullable: true })
   private creator?: UserEntity;
@@ -69,4 +74,7 @@ export class UserEntity {
 
   @ManyToOne(() => UserEntity, { nullable: true })
   private deleter?: UserEntity;
+
+  @OneToOne(() => GroupEntity, { nullable: false })
+  private group?: GroupEntity;
 }
