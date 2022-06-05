@@ -10,6 +10,7 @@ import { DEFAULT_CONNECTION } from '../common/typeorm/connections';
 import { ConfigurationService } from '../common/configuration/configuration.service';
 import { AdministrationModule } from './administration/administration.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
     }),
     AdministrationModule,
     AuthenticationModule,
+    GroupModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: IncomingRequestInterceptor },
