@@ -28,7 +28,8 @@ export class GroupController {
     return await this.groupService.groupList();
   }
 
-  @Get(':id')
+  @Public()
+  @Get('/:id')
   async getOneGroup(@Param() dto: EntityIdDTO): Promise<GroupEntity> {
     return await this.groupService.findById(dto.id);
   }
