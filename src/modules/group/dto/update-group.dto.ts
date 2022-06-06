@@ -1,6 +1,6 @@
 import { IsOptional, IsString, IsUUID, Length } from 'class-validator';
 import { CompleteToUpdate } from '../../../common/helpers/dto';
-import { GroupEntity } from '../entity/group.entity';
+import { GroupEntity } from '../entities/group.entity';
 
 export class UpdateGroupDTO implements CompleteToUpdate<GroupEntity> {
   @IsOptional()

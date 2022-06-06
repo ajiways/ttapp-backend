@@ -1,6 +1,6 @@
 import { IsOptional, IsUUID } from 'class-validator';
 import { Complete } from '../../../common/helpers/dto';
-import { StudentGroupEntity } from '../entity/student-groups.entity';
+import { StudentGroupEntity } from '../entities/student-groups.entity';
 
 export class SaveStudentGroupDTO implements Complete<StudentGroupEntity> {
   @IsUUID('4')

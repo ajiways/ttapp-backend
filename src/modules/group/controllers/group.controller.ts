@@ -6,17 +6,20 @@ import {
   Inject,
   Param,
   Patch,
+  Post,
 } from '@nestjs/common';
 import { EntityIdDTO } from '../../../common/helpers/entity/entity-id.dto';
 import { UserRequest } from '../../../common/user-request';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { Public } from '../../authentication/guards/authentication.guard';
+import { SaveGroupDTO } from '../dto/save-group.dto';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
-import { GroupEntity } from '../entity/group.entity';
+import { GroupEntity } from '../entities/group.entity';
 import {
   GroupList,
   GroupSeviceInterface,
 } from '../interfaces/group.service.interface';
+import { GroupSchedule } from '../interfaces/schedule.interfaces';
 import { GroupService } from '../services/group.service';
 
 @Controller('group')
@@ -50,5 +53,18 @@ export class GroupController {
     @UserRequest() user: UserEntity,
   ): Promise<boolean> {
     return await this.groupService.delete(dto.id, user);
+  }
+
+  @Post()
+  async createGroup(
+    @Body() dto: SaveGroupDTO,
+    @UserRequest() user: UserEntity,
+  ): Promise<GroupEntity> {
+    return await this.groupService.save(dto, user);
+  }
+
+  @Get('/schedule/:id')
+  async getGroupSchedule(@Param() dto: EntityIdDTO): Promise<GroupSchedule> {
+    return await this.groupService.getGroupSchedule(dto.id);
   }
 }

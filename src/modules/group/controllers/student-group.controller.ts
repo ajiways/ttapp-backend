@@ -14,7 +14,7 @@ import { UserRequest } from '../../../common/user-request';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { SaveStudentGroupDTO } from '../dto/save-student-group.dto';
 import { StudentGroupListDTO } from '../dto/student-group-list.dto';
-import { StudentGroupEntity } from '../entity/student-groups.entity';
+import { StudentGroupEntity } from '../entities/student-groups.entity';
 import { StudentGroupServiceInterface } from '../interfaces/student-group.service.interface';
 import { StudentGroupService } from '../services/student-group.service';
 

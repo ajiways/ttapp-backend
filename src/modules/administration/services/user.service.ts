@@ -28,8 +28,19 @@ export class UserService
   @Inject()
   private readonly studentGroupService: StudentGroupService;
 
-  protected async validateEntitiesBeforeSave(): Promise<void> {
-    //TODO: Nothing to do
+  protected async validateEntitiesBeforeSave(
+    entities: Partial<UserEntity>[],
+    manager: EntityManager,
+  ): Promise<void> {
+    await this.groupService.findByIds(
+      entities.map((entity) => {
+        if (!entity.groupId) {
+          throw new BadRequestException(`No group id was passed for user`);
+        }
+
+        return entity.groupId;
+      }, manager),
+    );
   }
 
   async save(
@@ -42,6 +53,7 @@ export class UserService
     }
 
     const candidates = await this.findOneWhere({ login: dto.login }, manager);
+    const group = await this.groupService.findById(dto.groupId, manager);
 
     if (candidates) {
       throw new BadRequestException(
@@ -54,11 +66,10 @@ export class UserService
         login: dto.login,
         password: await hash(dto.password, 7),
         creatorId: user.id,
+        groupId: group.id,
       },
       manager,
     );
-
-    const group = await this.groupService.findById(dto.groupId, manager);
 
     await this.studentGroupService.save(
       {
