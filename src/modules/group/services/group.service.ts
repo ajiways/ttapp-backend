@@ -5,10 +5,11 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { UserService } from '../../administration/services/user.service';
+import { DayService } from '../../day/services/day.service';
 import { WeekService } from '../../week/services/week.service';
 import { SaveGroupDTO } from '../dto/save-group.dto';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
@@ -32,6 +33,9 @@ export class GroupService
 
   @Inject()
   private readonly weekService: WeekService;
+
+  @Inject()
+  private readonly dayService: DayService;
 
   protected async validateEntitiesBeforeSave(
     entities: Partial<GroupEntity>[],
@@ -155,6 +159,13 @@ export class GroupService
       manager,
     );
 
+    const weeksIds = weeks.map((week) => week.id);
+
+    const weekDays = await this.dayService.findWhere(
+      { weekId: In(weeksIds) },
+      manager,
+    );
+
     //TODO: Complete
     return {
       id: group.id,
@@ -163,6 +174,7 @@ export class GroupService
         return {
           id: week.id,
           isEven: week.isEven,
+          days: weekDays.filter((day) => day.weekId === week.id),
         };
       }),
     };
