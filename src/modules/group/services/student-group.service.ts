@@ -7,7 +7,7 @@ import { EntityManager } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { SaveStudentGroupDTO } from '../dto/save-student-group.dto';
-import { StudentGroupEntity } from '../entity/student-groups.entity';
+import { StudentGroupEntity } from '../entities/student-groups.entity';
 import { StudentGroupServiceInterface } from '../interfaces/student-group.service.interface';
 import { GroupService } from './group.service';
 

@@ -2,7 +2,7 @@ import { EntityManager } from 'typeorm';
 import { BaseServiceInterface } from '../../../common/base-service.interface';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { SaveStudentGroupDTO } from '../dto/save-student-group.dto';
-import { StudentGroupEntity } from '../entity/student-groups.entity';
+import { StudentGroupEntity } from '../entities/student-groups.entity';
 
 export interface StudentGroupServiceInterface
   extends BaseServiceInterface<StudentGroupEntity> {

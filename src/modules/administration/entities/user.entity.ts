@@ -8,7 +8,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { dateTransformer } from '../../../common/typeorm/date-transformer';
-import { GroupEntity } from '../../group/entity/group.entity';
+
+interface IGroup {
+  headmanId: string;
+  title: string;
+}
 
 @Entity('users')
 export class UserEntity {
@@ -75,6 +79,6 @@ export class UserEntity {
   @ManyToOne(() => UserEntity, { nullable: true })
   private deleter?: UserEntity;
 
-  @OneToOne(() => GroupEntity, { nullable: false })
-  private group?: GroupEntity;
+  @OneToOne('GroupEntity', { nullable: false })
+  private group?: IGroup;
 }

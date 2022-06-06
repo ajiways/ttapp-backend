@@ -9,13 +9,15 @@ import { EntityManager } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { UserService } from '../../administration/services/user.service';
+import { WeekService } from '../../week/services/week.service';
 import { SaveGroupDTO } from '../dto/save-group.dto';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
-import { GroupEntity } from '../entity/group.entity';
+import { GroupEntity } from '../entities/group.entity';
 import {
   GroupList,
   GroupSeviceInterface,
 } from '../interfaces/group.service.interface';
+import { GroupSchedule } from '../interfaces/schedule.interfaces';
 
 @Injectable()
 export class GroupService
@@ -27,6 +29,9 @@ export class GroupService
 
   @Inject(forwardRef(() => UserService))
   private readonly userService: UserService;
+
+  @Inject()
+  private readonly weekService: WeekService;
 
   protected async validateEntitiesBeforeSave(
     entities: Partial<GroupEntity>[],
@@ -62,7 +67,24 @@ export class GroupService
       );
     }
 
-    return await this.saveEntity({ ...dto, creatorId: user.id }, manager);
+    const group = await this.saveEntity(
+      { ...dto, creatorId: user.id },
+      manager,
+    );
+
+    await this.weekService.save(
+      { groupId: group.id, isEven: true },
+      user,
+      manager,
+    );
+
+    await this.weekService.save(
+      { groupId: group.id, isEven: false },
+      user,
+      manager,
+    );
+
+    return group;
   }
 
   async groupList(manager: EntityManager | undefined): Promise<GroupList> {
@@ -116,5 +138,33 @@ export class GroupService
       },
       manager,
     );
+  }
+
+  async getGroupSchedule(
+    id: string,
+    manager: EntityManager | undefined,
+  ): Promise<GroupSchedule> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    const group = await this.findById(id, manager);
+
+    const weeks = await this.weekService.findWhere(
+      { groupId: group.id },
+      manager,
+    );
+
+    //TODO: Complete
+    return {
+      id: group.id,
+      title: group.title,
+      weeks: weeks.map((week) => {
+        return {
+          id: week.id,
+          isEven: week.isEven,
+        };
+      }),
+    };
   }
 }
