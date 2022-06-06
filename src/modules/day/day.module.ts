@@ -6,6 +6,7 @@ const services = [DayService];
 const controllers = [DayController];
 
 @Module({
+  imports: [],
   controllers: [...controllers],
   providers: [...services],
   exports: [...services],

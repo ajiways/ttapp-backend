@@ -7,9 +7,11 @@ import {
 } from '@nestjs/common';
 import { EntityManager, In } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
+import { notEmpty } from '../../../common/utils';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { UserService } from '../../administration/services/user.service';
 import { DayService } from '../../day/services/day.service';
+import { LessonService } from '../../lesson/services/lesson.service';
 import { WeekService } from '../../week/services/week.service';
 import { SaveGroupDTO } from '../dto/save-group.dto';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
@@ -18,7 +20,7 @@ import {
   GroupList,
   GroupSeviceInterface,
 } from '../interfaces/group.service.interface';
-import { GroupSchedule } from '../interfaces/schedule.interfaces';
+import { DaySchedule, GroupSchedule } from '../interfaces/schedule.interfaces';
 
 @Injectable()
 export class GroupService
@@ -36,6 +38,9 @@ export class GroupService
 
   @Inject()
   private readonly dayService: DayService;
+
+  @Inject()
+  private readonly lessonService: LessonService;
 
   protected async validateEntitiesBeforeSave(
     entities: Partial<GroupEntity>[],
@@ -166,7 +171,14 @@ export class GroupService
       manager,
     );
 
-    //TODO: Complete
+    const weekDayIds = weekDays.map((day) => day.id);
+
+    const lessons = await this.lessonService.findWhere(
+      { dayId: In(weekDayIds) },
+      manager,
+    );
+
+    //TODO: Awful, needs to rework asap
     return {
       id: group.id,
       title: group.title,
@@ -174,7 +186,19 @@ export class GroupService
         return {
           id: week.id,
           isEven: week.isEven,
-          days: weekDays.filter((day) => day.weekId === week.id),
+          days: weekDays
+            .map((day): DaySchedule | undefined => {
+              if (day.weekId === week.id) {
+                return {
+                  id: day.id,
+                  order: day.order,
+                  title: day.title,
+                  lessons: lessons.filter((lesson) => lesson.dayId === day.id),
+                };
+              }
+              return undefined;
+            })
+            .filter(notEmpty),
         };
       }),
     };

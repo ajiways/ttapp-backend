@@ -16,8 +16,7 @@ export interface DaySchedule {
   id: string;
   title: EDayNames;
   order: number;
-  //TODO: Complete
-  // lessons: LessonInterface[];
+  lessons: LessonInterface[];
 }
 
 export interface LessonInterface {
