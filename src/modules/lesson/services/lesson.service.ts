@@ -2,59 +2,56 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
 import { UserEntity } from '../../administration/entities/user.entity';
-import { SaveDayDTO } from '../dto/save-day.dto';
-import { UpdateDayDTO } from '../dto/update-day.dto';
-import { DayEntity } from '../entities/day.entity';
-import { DayServiceInterface } from '../interfaces/day-service.interface';
+import { SaveLessonDTO } from '../dto/save-lesson.dto';
+import { UpdateLessonDTO } from '../dto/update-lesson.dto';
+import { LessonEntity } from '../entities/lesson.entity';
+import { LessonServiceInterface } from '../interfaces/lesson-service.interface';
 
 @Injectable()
-export class DayService
-  extends AbstractService<DayEntity>
-  implements DayServiceInterface
+export class LessonService
+  extends AbstractService<LessonEntity>
+  implements LessonServiceInterface
 {
-  protected Entity = DayEntity;
-  protected deletedAtColumnName: string | null = 'deletedAt';
+  protected Entity = LessonEntity;
 
   protected async validateEntitiesBeforeSave(
-    entities: Partial<DayEntity>[],
+    entities: Partial<LessonEntity>[],
     manager: EntityManager,
   ): Promise<void> {
-    //TODO: implement
+    //TODO: impelement
   }
 
   async save(
-    dto: SaveDayDTO,
-    user: UserEntity,
-    manager: EntityManager | undefined,
-  ): Promise<DayEntity> {
+    dto: SaveLessonDTO,
+    user?: UserEntity,
+    manager?: EntityManager,
+  ): Promise<LessonEntity> {
     if (!manager) {
       return this.startTransaction((manager) => this.save(dto, user, manager));
     }
 
-    const existedDay = await this.findOneWhere(
+    const existingLesson = await this.findOneWhere(
       {
-        weekId: dto.weekId,
         order: dto.order,
+        dayId: dto.dayId,
       },
       manager,
     );
 
-    if (existedDay) {
+    if (existingLesson) {
       throw new BadRequestException(
-        `Day with order ${dto.order} in week ${dto.weekId} already exists`,
+        `Lesson with order ${dto.order} in day ${dto.dayId} already exists`,
       );
     }
 
-    const day = await this.saveEntity({ ...dto, creatorId: user.id }, manager);
-
-    return day;
+    return await this.saveEntity({ ...dto, creatorId: user?.id }, manager);
   }
 
   async update(
-    dto: UpdateDayDTO,
+    dto: UpdateLessonDTO,
     user: UserEntity,
-    manager: EntityManager | undefined,
-  ): Promise<DayEntity> {
+    manager?: EntityManager,
+  ): Promise<LessonEntity> {
     if (!manager) {
       return this.startTransaction((manager) =>
         this.update(dto, user, manager),
@@ -70,7 +67,7 @@ export class DayService
   async delete(
     id: string,
     user: UserEntity,
-    manager: EntityManager | undefined,
+    manager?: EntityManager,
   ): Promise<boolean> {
     if (!manager) {
       return this.startTransaction((manager) => this.delete(id, user, manager));
@@ -82,10 +79,14 @@ export class DayService
     return await this.deleteEntities([toDelete], manager);
   }
 
-  async getWeekDays(
-    weekId: string,
-    manager: EntityManager | undefined,
-  ): Promise<DayEntity[]> {
-    return await this.findWhere({ weekId }, manager);
+  async getByDayId(
+    dayId: string,
+    manager?: EntityManager,
+  ): Promise<LessonEntity[]> {
+    if (!manager) {
+      manager = this.connection.manager;
+    }
+
+    return await this.findWhere({ dayId }, manager);
   }
 }

@@ -14,6 +14,7 @@ import { GroupModule } from './group/group.module';
 import { AppController } from './app.controller';
 import { WeekModule } from './week/week.module';
 import { DayModule } from './day/day.module';
+import { LessonModule } from './lesson/lesson.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { DayModule } from './day/day.module';
     GroupModule,
     WeekModule,
     DayModule,
+    LessonModule,
   ],
   controllers: [AppController],
   providers: [
