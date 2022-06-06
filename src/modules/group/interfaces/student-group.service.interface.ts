@@ -8,8 +8,8 @@ export interface StudentGroupServiceInterface
   extends BaseServiceInterface<StudentGroupEntity> {
   save(
     dto: SaveStudentGroupDTO,
-    user: UserEntity,
     manager?: EntityManager,
+    user?: UserEntity,
   ): Promise<StudentGroupEntity>;
 
   delete(

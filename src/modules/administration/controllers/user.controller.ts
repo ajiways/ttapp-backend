@@ -52,6 +52,6 @@ export class UserController {
     @Body() dto: CreateUserDTO,
     @UserRequest() user: UserEntity,
   ): Promise<UserEntity> {
-    return await this.usersService.save(dto, user);
+    return await this.usersService.save(dto, undefined, user);
   }
 }

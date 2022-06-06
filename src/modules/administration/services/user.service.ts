@@ -45,11 +45,11 @@ export class UserService
 
   async save(
     dto: CreateUserDTO,
-    user: UserEntity,
     manager: EntityManager | undefined,
+    user?: UserEntity,
   ): Promise<UserEntity & { groupId: string }> {
     if (!manager) {
-      return this.startTransaction((manager) => this.save(dto, user, manager));
+      return this.startTransaction((manager) => this.save(dto, manager, user));
     }
 
     const candidates = await this.findOneWhere({ login: dto.login }, manager);
@@ -65,7 +65,7 @@ export class UserService
       {
         login: dto.login,
         password: await hash(dto.password, 7),
-        creatorId: user.id,
+        creatorId: user?.id,
         groupId: group.id,
       },
       manager,
@@ -76,8 +76,8 @@ export class UserService
         groupId: group.id,
         studentId: savedUser.id,
       },
-      user,
       manager,
+      user,
     );
 
     return { ...savedUser, groupId: group.id };

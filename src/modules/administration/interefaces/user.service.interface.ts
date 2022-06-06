@@ -7,8 +7,8 @@ import { UserEntity } from '../entities/user.entity';
 export interface UserServiceInterface extends BaseServiceInterface<UserEntity> {
   save(
     dto: CreateUserDTO,
-    user?: UserEntity,
     manager?: EntityManager,
+    user?: UserEntity,
   ): Promise<UserEntity & { groupId: string }>;
 
   update(

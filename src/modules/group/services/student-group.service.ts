@@ -39,18 +39,18 @@ export class StudentGroupService
 
   async save(
     dto: SaveStudentGroupDTO,
-    user: UserEntity,
     manager: EntityManager | undefined,
+    user?: UserEntity,
   ): Promise<StudentGroupEntity> {
     if (!manager) {
-      return this.startTransaction((manager) => this.save(dto, user, manager));
+      return this.startTransaction((manager) => this.save(dto, manager, user));
     }
 
     if (!dto.id) {
-      return await this.saveEntity({ ...dto, creatorId: user.id }, manager);
+      return await this.saveEntity({ ...dto, creatorId: user?.id }, manager);
     }
 
-    return await this.saveEntity({ ...dto, editorId: user.id }, manager);
+    return await this.saveEntity({ ...dto, editorId: user?.id }, manager);
   }
 
   async delete(

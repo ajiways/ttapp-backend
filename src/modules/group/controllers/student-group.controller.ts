@@ -43,7 +43,7 @@ export class StudentGroupController {
     @Body() dto: SaveStudentGroupDTO,
     @UserRequest() user: UserEntity,
   ): Promise<StudentGroupEntity> {
-    return await this.studentGroupService.save(dto, user);
+    return await this.studentGroupService.save(dto, undefined, user);
   }
 
   @Delete()
