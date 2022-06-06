@@ -13,6 +13,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { GroupModule } from './group/group.module';
 import { AppController } from './app.controller';
 import { WeekModule } from './week/week.module';
+import { DayModule } from './day/day.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { WeekModule } from './week/week.module';
     AuthenticationModule,
     GroupModule,
     WeekModule,
+    DayModule,
   ],
   controllers: [AppController],
   providers: [

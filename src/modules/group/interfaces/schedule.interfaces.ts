@@ -9,15 +9,15 @@ export interface GroupSchedule {
 export interface WeekSchedule {
   id: string;
   isEven: boolean;
-  //TODO: Complete
-  // days: DaySchedule[];
+  days: DaySchedule[];
 }
 
 export interface DaySchedule {
   id: string;
-  name: EDayNames;
+  title: EDayNames;
   order: number;
-  lessons: LessonInterface[];
+  //TODO: Complete
+  // lessons: LessonInterface[];
 }
 
 export interface LessonInterface {
