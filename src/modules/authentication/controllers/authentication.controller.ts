@@ -41,6 +41,7 @@ export class AuthenticationController {
       expiration: response.expiration,
       token: response.token,
       userId: response.userId,
+      groupId: response.groupId,
     };
   }
 
@@ -85,7 +86,7 @@ export class AuthenticationController {
   async refresh(
     @Req() req: RequestInterface,
     @Res({ passthrough: true }) res: ResponseInterface,
-  ): Promise<Omit<TokenResponse, 'refreshToken' | 'userId'>> {
+  ): Promise<Omit<TokenResponse, 'refreshToken' | 'userId' | 'groupId'>> {
     const refreshToken = req.cookies['refreshToken'];
     const userId = req.user.id;
 

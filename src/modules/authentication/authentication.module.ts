@@ -8,8 +8,9 @@ import { AdministrationModule } from '../administration/administration.module';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { AuthenticationGuard } from './guards/authentication.guard';
 import { AuthenticationStrategy } from './authentication.strategy';
+import { GroupModule } from '../group/group.module';
 
-const modules = [AdministrationModule];
+const modules = [AdministrationModule, GroupModule];
 
 const services = [
   AuthenticationService,

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,6 +18,8 @@ import { RefreshTokenEntity } from '../entities/refresh-token.entity';
 import { RefreshTokenService } from './refresh-token.service';
 import { UserServiceInterface } from '../../administration/interefaces/user.service.interface';
 import { RefreshTokenServiceInterface } from '../interfaces/refresh-token.service.interface';
+import { StudentGroupService } from '../../group/services/student-group.service';
+import { StudentGroupServiceInterface } from '../../group/interfaces/student-group.service.interface';
 
 export type TAuthenticationToken = {
   id: string;
@@ -34,6 +37,9 @@ export class AuthenticationService implements AuthenticationServiceInterface {
 
   @Inject()
   private jwtService: JwtService;
+
+  @Inject(StudentGroupService)
+  private studentGroupService: StudentGroupServiceInterface;
 
   @Inject(RefreshTokenService)
   private readonly refreshTokenService: RefreshTokenServiceInterface;
@@ -91,7 +97,19 @@ export class AuthenticationService implements AuthenticationServiceInterface {
     const passwordMatched = await compare(password, user.password);
 
     if (passwordMatched) {
-      return await this.generateToken(user);
+      const tokenData = await this.generateToken(user);
+      const userGroup = await this.studentGroupService.findOneWhere({
+        studentId: user.id,
+      });
+
+      if (!userGroup) {
+        throw new InternalServerErrorException(`User doesn't have a group`);
+      }
+
+      return {
+        ...tokenData,
+        groupId: userGroup.id,
+      };
     } else {
       throw new BadRequestException(`Wrong login or password`);
     }

@@ -1,4 +1,4 @@
-import { EntityManager } from 'typeorm';
+import { EntityManager, FindConditions } from 'typeorm';
 import { BaseServiceInterface } from '../../../common/base-service.interface';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { SaveStudentGroupDTO } from '../dto/save-student-group.dto';
@@ -23,4 +23,9 @@ export interface StudentGroupServiceInterface
     skip: number,
     manager?: EntityManager,
   ): Promise<StudentGroupEntity[]>;
+
+  findOneWhere(
+    where: FindConditions<StudentGroupEntity>,
+    manager?: EntityManager,
+  ): Promise<StudentGroupEntity | undefined>;
 }
