@@ -63,6 +63,7 @@ export class GroupController {
     return await this.groupService.save(dto, user);
   }
 
+  @Public()
   @Get('/schedule/:id')
   async getGroupSchedule(@Param() dto: EntityIdDTO): Promise<GroupSchedule> {
     return await this.groupService.getGroupSchedule(dto.id);
