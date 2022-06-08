@@ -20,6 +20,7 @@ import { UserServiceInterface } from '../../administration/interefaces/user.serv
 import { RefreshTokenServiceInterface } from '../interfaces/refresh-token.service.interface';
 import { StudentGroupService } from '../../group/services/student-group.service';
 import { StudentGroupServiceInterface } from '../../group/interfaces/student-group.service.interface';
+import { GroupService } from '../../group/services/group.service';
 
 export type TAuthenticationToken = {
   id: string;
@@ -43,6 +44,9 @@ export class AuthenticationService implements AuthenticationServiceInterface {
 
   @Inject(RefreshTokenService)
   private readonly refreshTokenService: RefreshTokenServiceInterface;
+
+  @Inject(GroupService)
+  private readonly groupService: StudentGroupServiceInterface;
 
   async validateToken(token: TAuthenticationToken): Promise<UserEntity | null> {
     const user = await this.usersService.findByIdNoError(token.id);
@@ -98,17 +102,19 @@ export class AuthenticationService implements AuthenticationServiceInterface {
 
     if (passwordMatched) {
       const tokenData = await this.generateToken(user);
-      const userGroup = await this.studentGroupService.findOneWhere({
+      const userStudentGroup = await this.studentGroupService.findOneWhere({
         studentId: user.id,
       });
 
-      if (!userGroup) {
+      if (!userStudentGroup) {
         throw new InternalServerErrorException(`User doesn't have a group`);
       }
 
+      const group = await this.groupService.findById(userStudentGroup.groupId);
+
       return {
         ...tokenData,
-        groupId: userGroup.id,
+        groupId: group.id,
       };
     } else {
       throw new BadRequestException(`Wrong login or password`);
