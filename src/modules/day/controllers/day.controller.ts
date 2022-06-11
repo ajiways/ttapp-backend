@@ -8,9 +8,11 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { EPermission } from '../../../common/enums/permissions';
 import { EntityIdDTO } from '../../../common/helpers/entity/entity-id.dto';
 import { UserRequest } from '../../../common/user-request';
 import { UserEntity } from '../../administration/entities/user.entity';
+import { RequirePermissions } from '../../authentication/guards/roles.guard';
 import { SaveDayDTO } from '../dto/save-day.dto';
 import { UpdateDayDTO } from '../dto/update-day.dto';
 import { DayEntity } from '../entities/day.entity';
@@ -27,6 +29,7 @@ export class DayController {
     return await this.dayService.getWeekDays(dto.id);
   }
 
+  @RequirePermissions([EPermission.DAY_CREATE])
   @Post()
   async createDay(
     @Body() dto: SaveDayDTO,
@@ -35,6 +38,7 @@ export class DayController {
     return await this.dayService.save(dto, user);
   }
 
+  @RequirePermissions([EPermission.DAY_DELETE])
   @Delete()
   async deleteDay(
     @Body() dto: EntityIdDTO,
@@ -43,6 +47,7 @@ export class DayController {
     return await this.dayService.delete(dto.id, user);
   }
 
+  @RequirePermissions([EPermission.DAY_UPDATE])
   @Patch()
   async updateDay(
     @Body() dto: UpdateDayDTO,
