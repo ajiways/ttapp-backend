@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
 import { Observable } from 'rxjs';
 
 export const Public = () => SetMetadata('isPublic', true);
@@ -30,10 +29,6 @@ export class AuthenticationGuard extends AuthGuard('jwt') {
     }
 
     return super.canActivate(context);
-  }
-
-  getRequest(context: ExecutionContext) {
-    return context.switchToHttp().getRequest<Request>();
   }
 
   handleRequest(err: Error, user: Record<any, any>) {

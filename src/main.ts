@@ -10,7 +10,7 @@ async function bootstrap() {
   app.enableCors({ origin: config.env.FRONTEND_URL, credentials: true });
   app.use(cookieParser());
 
-  app.useGlobalGuards(app.get('AuthenticationGuard'));
+  app.useGlobalGuards(app.get('AuthenticationGuard'), app.get('RolesGuard'));
 
   app.useGlobalPipes(
     new ValidationPipe({
