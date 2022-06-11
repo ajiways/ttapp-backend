@@ -42,6 +42,7 @@ export class AuthenticationController {
       token: response.token,
       userId: response.userId,
       groupId: response.groupId,
+      userRoles: response.userRoles,
     };
   }
 
@@ -63,6 +64,7 @@ export class AuthenticationController {
       token: response.token,
       userId: response.userId,
       groupId: response.groupId,
+      userRoles: response.userRoles,
     };
   }
 
@@ -100,6 +102,7 @@ export class AuthenticationController {
     return {
       expiration: result.expiration,
       token: result.token,
+      userRoles: result.userRoles,
     };
   }
 }

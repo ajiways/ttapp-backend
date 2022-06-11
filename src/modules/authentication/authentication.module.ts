@@ -9,6 +9,7 @@ import { RefreshTokenService } from './services/refresh-token.service';
 import { AuthenticationGuard } from './guards/authentication.guard';
 import { AuthenticationStrategy } from './authentication.strategy';
 import { GroupModule } from '../group/group.module';
+import { RolesGuard } from './guards/roles.guard';
 
 const modules = [AdministrationModule, GroupModule];
 
@@ -17,6 +18,7 @@ const services = [
   RefreshTokenService,
   AuthenticationGuard,
   AuthenticationStrategy,
+  RolesGuard,
 ];
 
 @Module({

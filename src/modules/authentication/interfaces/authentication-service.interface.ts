@@ -1,4 +1,5 @@
 import { EntityManager } from 'typeorm';
+import { RoleEntity } from '../../administration/entities/role.entity';
 import { TokenResponse } from '../controllers/common/token-response.interface';
 import { LoginDTO } from '../dto/login.dto';
 import { RegistrationDTO } from '../dto/registration.dto';
@@ -18,6 +19,7 @@ export interface AuthenticationServiceInterface {
     userId: string;
     token: string;
     refreshToken: string;
+    userRoles: RoleEntity[];
   }>;
   logout(
     refreshToken: string | undefined,

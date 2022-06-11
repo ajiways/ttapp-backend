@@ -21,6 +21,11 @@ import { RefreshTokenServiceInterface } from '../interfaces/refresh-token.servic
 import { StudentGroupService } from '../../group/services/student-group.service';
 import { StudentGroupServiceInterface } from '../../group/interfaces/student-group.service.interface';
 import { GroupService } from '../../group/services/group.service';
+import { UserRolesService } from '../../administration/services/user-roles.service';
+import { UserRolesServiceInterface } from '../../administration/interefaces/user-roles.service.interface';
+import { RolesService } from '../../administration/services/roles.service';
+import { RolesServiceInterface } from '../../administration/interefaces/roles.service.interface';
+import { RoleEntity } from '../../administration/entities/role.entity';
 
 export type TAuthenticationToken = {
   id: string;
@@ -47,6 +52,12 @@ export class AuthenticationService implements AuthenticationServiceInterface {
 
   @Inject(GroupService)
   private readonly groupService: StudentGroupServiceInterface;
+
+  @Inject(UserRolesService)
+  private readonly userRolesService: UserRolesServiceInterface;
+
+  @Inject(RolesService)
+  private readonly rolesService: RolesServiceInterface;
 
   async validateToken(token: TAuthenticationToken): Promise<UserEntity | null> {
     const user = await this.usersService.findByIdNoError(token.id);
@@ -111,10 +122,12 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       }
 
       const group = await this.groupService.findById(userStudentGroup.groupId);
+      const userRoles = await this.userRolesService.getUserRoles(user);
 
       return {
         ...tokenData,
         groupId: group.id,
+        userRoles,
       };
     } else {
       throw new BadRequestException(`Wrong login or password`);
@@ -132,9 +145,18 @@ export class AuthenticationService implements AuthenticationServiceInterface {
 
     const tokenData = await this.generateToken(user);
 
+    const studentRole = await this.rolesService.getRoleByTitle('student');
+
+    if (!studentRole) {
+      throw new InternalServerErrorException('No base student role was found');
+    }
+
+    await this.userRolesService.save(user.id, studentRole.id);
+
     return {
       ...tokenData,
       groupId: user.groupId,
+      userRoles: [studentRole],
     };
   }
 
@@ -146,6 +168,7 @@ export class AuthenticationService implements AuthenticationServiceInterface {
     userId: string;
     token: string;
     refreshToken: string;
+    userRoles: RoleEntity[];
   }> {
     if (!refreshToken || !userId) {
       throw new BadRequestException('User id refresh token was not provided');
@@ -179,7 +202,14 @@ export class AuthenticationService implements AuthenticationServiceInterface {
 
     const user = await this.usersService.findById(userId);
 
-    return await this.generateToken(user, existingToken);
+    const userRoles = await this.userRolesService.getUserRoles(user);
+
+    const res = await this.generateToken(user, existingToken);
+
+    return {
+      ...res,
+      userRoles,
+    };
   }
 
   async logout(refreshToken: string | undefined): Promise<void> {
