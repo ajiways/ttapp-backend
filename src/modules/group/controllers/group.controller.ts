@@ -8,10 +8,12 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { EPermission } from '../../../common/enums/permissions';
 import { EntityIdDTO } from '../../../common/helpers/entity/entity-id.dto';
 import { UserRequest } from '../../../common/user-request';
 import { UserEntity } from '../../administration/entities/user.entity';
 import { Public } from '../../authentication/guards/authentication.guard';
+import { RequirePermissions } from '../../authentication/guards/roles.guard';
 import { SaveGroupDTO } from '../dto/save-group.dto';
 import { UpdateGroupDTO } from '../dto/update-group.dto';
 import { GroupEntity } from '../entities/group.entity';
@@ -39,6 +41,7 @@ export class GroupController {
     return await this.groupService.findById(dto.id);
   }
 
+  @RequirePermissions([EPermission.GROUP_EDIT])
   @Patch()
   async updateGroup(
     @Body() dto: UpdateGroupDTO,
@@ -47,6 +50,7 @@ export class GroupController {
     return await this.groupService.update(dto, user);
   }
 
+  @RequirePermissions([EPermission.GROUP_DELETE])
   @Delete()
   async deleteGroup(
     @Body() dto: EntityIdDTO,
@@ -55,6 +59,7 @@ export class GroupController {
     return await this.groupService.delete(dto.id, user);
   }
 
+  @RequirePermissions([EPermission.GROUP_CREATE])
   @Post()
   async createGroup(
     @Body() dto: SaveGroupDTO,

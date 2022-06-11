@@ -15,6 +15,8 @@ import { UpdateUserDTO } from '../dto/update-user.dto';
 import { EntityIdDTO } from '../../../common/helpers/entity/entity-id.dto';
 import { CreateUserDTO } from '../dto/create-user.dto';
 import { UserRequest } from '../../../common/user-request';
+import { RequirePermissions } from '../../authentication/guards/roles.guard';
+import { EPermission } from '../../../common/enums/permissions';
 
 @Controller('user')
 export class UserController {
@@ -31,6 +33,7 @@ export class UserController {
     return await this.usersService.findAll();
   }
 
+  @RequirePermissions([EPermission.USER_UPDATE])
   @Patch()
   async updateUser(
     @Body() args: UpdateUserDTO,
@@ -39,6 +42,7 @@ export class UserController {
     return await this.usersService.update(args, user);
   }
 
+  @RequirePermissions([EPermission.USER_DELETE])
   @Delete()
   async deleteUser(
     @Body() dto: EntityIdDTO,
@@ -47,6 +51,7 @@ export class UserController {
     return await this.usersService.delete(dto.id, user);
   }
 
+  @RequirePermissions([EPermission.USER_CREATE])
   @Post()
   async createUser(
     @Body() dto: CreateUserDTO,
