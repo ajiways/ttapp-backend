@@ -17,7 +17,7 @@ export interface UserRolesServiceInterface
   getUserRoles(
     user: UserEntity,
     manager?: EntityManager,
-  ): Promise<RoleEntity[]>;
+  ): Promise<Pick<RoleEntity, 'id' | 'title'>[]>;
 
   getUserPermissions(
     user: UserEntity,

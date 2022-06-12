@@ -25,7 +25,6 @@ import { UserRolesService } from '../../administration/services/user-roles.servi
 import { UserRolesServiceInterface } from '../../administration/interefaces/user-roles.service.interface';
 import { RolesService } from '../../administration/services/roles.service';
 import { RolesServiceInterface } from '../../administration/interefaces/roles.service.interface';
-import { RoleEntity } from '../../administration/entities/role.entity';
 
 export type TAuthenticationToken = {
   id: string;
@@ -163,13 +162,7 @@ export class AuthenticationService implements AuthenticationServiceInterface {
   async refresh(
     refreshToken: string | undefined,
     userId: string | undefined,
-  ): Promise<{
-    expiration: string;
-    userId: string;
-    token: string;
-    refreshToken: string;
-    userRoles: RoleEntity[];
-  }> {
+  ): Promise<Omit<TokenResponse, 'groupId'>> {
     if (!refreshToken || !userId) {
       throw new BadRequestException('User id refresh token was not provided');
     }

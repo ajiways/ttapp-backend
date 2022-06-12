@@ -6,5 +6,5 @@ export interface TokenResponse {
   token: string;
   groupId: string;
   refreshToken: string;
-  userRoles: RoleEntity[];
+  userRoles: Pick<RoleEntity, 'id' | 'title'>[];
 }
