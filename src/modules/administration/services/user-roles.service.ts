@@ -61,16 +61,24 @@ export class UserRolesService
   async getUserRoles(
     user: UserEntity,
     manager: EntityManager | undefined,
-  ): Promise<RoleEntity[]> {
+  ): Promise<Pick<RoleEntity, 'id' | 'title'>[]> {
     if (!manager) {
       manager = this.connection.manager;
     }
 
     const userRoles = await this.findWhere({ userId: user.id }, manager);
-    return this.rolesService.findByIds(
+
+    const roles = await this.rolesService.findByIds(
       userRoles.map((i) => i.roleId),
       manager,
     );
+
+    return roles.map((i): Pick<RoleEntity, 'id' | 'title'> => {
+      return {
+        id: i.id,
+        title: i.title,
+      };
+    });
   }
 
   async save(
