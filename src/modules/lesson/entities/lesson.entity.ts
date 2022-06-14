@@ -15,7 +15,7 @@ export class LessonEntity extends DeletedEntity implements LessonInterface {
   @Column({ type: 'varchar', nullable: false })
   teacher: string;
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'varchar', nullable: false })
   cabinetNumber: string;
 
   @Column({ type: 'varchar', nullable: false })
