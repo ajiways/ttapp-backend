@@ -66,7 +66,7 @@ export class UserEntity {
   })
   creatorId: string;
 
-  @Column({ type: 'uuid', nullable: false })
+  @Column({ type: 'uuid', nullable: true })
   groupId: string;
 
   // Related entities
@@ -79,6 +79,6 @@ export class UserEntity {
   @ManyToOne(() => UserEntity, { nullable: true })
   private deleter?: UserEntity;
 
-  @OneToOne('GroupEntity', { nullable: false })
+  @OneToOne('GroupEntity', { nullable: true })
   private group?: IGroup;
 }
