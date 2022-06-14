@@ -107,6 +107,7 @@ export class GroupService
       return {
         id: group.id,
         title: group.title,
+        headmanId: group.headmanId,
       };
     });
   }
