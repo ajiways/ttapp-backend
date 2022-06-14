@@ -9,10 +9,13 @@ import { EntityManager } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
 import { GroupService } from '../../group/services/group.service';
 import { StudentGroupService } from '../../group/services/student-group.service';
+import { SaveHeadmanDTO } from '../dto/create-headman.dto';
 import { CreateUserDTO } from '../dto/create-user.dto';
 import { UpdateUserDTO } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
 import { UserServiceInterface } from '../interefaces/user.service.interface';
+import { RolesService } from './roles.service';
+import { UserRolesService } from './user-roles.service';
 
 @Injectable()
 export class UserService
@@ -28,19 +31,17 @@ export class UserService
   @Inject()
   private readonly studentGroupService: StudentGroupService;
 
+  @Inject()
+  private readonly userRolesService: UserRolesService;
+
+  @Inject()
+  private readonly rolesService: RolesService;
+
   protected async validateEntitiesBeforeSave(
     entities: Partial<UserEntity>[],
     manager: EntityManager,
   ): Promise<void> {
-    await this.groupService.findByIds(
-      entities.map((entity) => {
-        if (!entity.groupId) {
-          throw new BadRequestException(`No group id was passed for user`);
-        }
-
-        return entity.groupId;
-      }, manager),
-    );
+    //TODO: fix
   }
 
   async save(
@@ -53,6 +54,7 @@ export class UserService
     }
 
     const candidates = await this.findOneWhere({ login: dto.login }, manager);
+
     const group = await this.groupService.findById(dto.groupId, manager);
 
     if (candidates) {
@@ -66,7 +68,7 @@ export class UserService
         login: dto.login,
         password: await hash(dto.password, 7),
         creatorId: user?.id,
-        groupId: group.id,
+        groupId: group?.id,
       },
       manager,
     );
@@ -80,7 +82,81 @@ export class UserService
       user,
     );
 
+    const studentRole = await this.rolesService.findOneWhere(
+      {
+        title: 'student',
+      },
+      manager,
+    );
+
+    await this.userRolesService.saveEntity(
+      {
+        roleId: studentRole?.id,
+        userId: savedUser.id,
+      },
+      manager,
+    );
+
     return { ...savedUser, groupId: group.id };
+  }
+
+  async createHeadman(
+    dto: SaveHeadmanDTO,
+    user: UserEntity,
+    manager?: EntityManager,
+  ): Promise<UserEntity> {
+    if (!manager) {
+      return this.startTransaction((manager) =>
+        this.createHeadman(dto, user, manager),
+      );
+    }
+
+    const candidates = await this.findOneWhere({ login: dto.login }, manager);
+
+    if (candidates) {
+      throw new BadRequestException(
+        `User with login ${dto.login} already exists`,
+      );
+    }
+
+    const studentRole = await this.rolesService.findOneWhere(
+      {
+        title: 'student',
+      },
+      manager,
+    );
+
+    const headmanRole = await this.rolesService.findOneWhere(
+      {
+        title: 'headman',
+      },
+      manager,
+    );
+
+    const savedUser = await this.saveEntity(
+      {
+        login: dto.login,
+        password: await hash(dto.password, 7),
+        creatorId: user.id,
+      },
+      manager,
+    );
+
+    await this.userRolesService.saveEntities(
+      [
+        {
+          roleId: studentRole?.id,
+          userId: savedUser.id,
+        },
+        {
+          roleId: headmanRole?.id,
+          userId: savedUser.id,
+        },
+      ],
+      manager,
+    );
+
+    return savedUser;
   }
 
   async update(

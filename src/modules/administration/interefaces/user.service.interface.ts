@@ -1,5 +1,6 @@
 import { EntityManager } from 'typeorm';
 import { BaseServiceInterface } from '../../../common/base-service.interface';
+import { SaveHeadmanDTO } from '../dto/create-headman.dto';
 import { CreateUserDTO } from '../dto/create-user.dto';
 import { UpdateUserDTO } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
@@ -13,6 +14,12 @@ export interface UserServiceInterface extends BaseServiceInterface<UserEntity> {
 
   update(
     dto: UpdateUserDTO,
+    user: UserEntity,
+    manager?: EntityManager,
+  ): Promise<UserEntity>;
+
+  createHeadman(
+    dto: SaveHeadmanDTO,
     user: UserEntity,
     manager?: EntityManager,
   ): Promise<UserEntity>;
