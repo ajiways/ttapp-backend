@@ -37,9 +37,16 @@ export class StudentGroupController {
     return await this.studentGroupService.findById(dto.id);
   }
 
-  @Patch()
   @Post()
-  async updateOrSave(
+  async save(
+    @Body() dto: SaveStudentGroupDTO,
+    @UserRequest() user: UserEntity,
+  ): Promise<StudentGroupEntity> {
+    return await this.studentGroupService.save(dto, undefined, user);
+  }
+
+  @Patch()
+  async update(
     @Body() dto: SaveStudentGroupDTO,
     @UserRequest() user: UserEntity,
   ): Promise<StudentGroupEntity> {
