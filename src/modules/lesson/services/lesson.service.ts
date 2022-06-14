@@ -14,6 +14,8 @@ export class LessonService
 {
   protected Entity = LessonEntity;
 
+  protected deletedAtColumnName: string | null = 'deletedAt';
+
   protected async validateEntitiesBeforeSave(
     entities: Partial<LessonEntity>[],
     manager: EntityManager,
@@ -75,8 +77,11 @@ export class LessonService
 
     const toDelete = await this.findById(id, manager);
     toDelete.deleterId = user.id;
+    toDelete.deletedAt = new Date(Date.now());
 
-    return await this.deleteEntities([toDelete], manager);
+    await this.saveEntity(toDelete, manager);
+
+    return true;
   }
 
   async getByDayId(
