@@ -17,6 +17,7 @@ import { CreateUserDTO } from '../dto/create-user.dto';
 import { UserRequest } from '../../../common/user-request';
 import { RequirePermissions } from '../../authentication/guards/roles.guard';
 import { EPermission } from '../../../common/enums/permissions';
+import { SaveHeadmanDTO } from '../dto/create-headman.dto';
 
 @Controller('user')
 export class UserController {
@@ -26,6 +27,14 @@ export class UserController {
   @Get(':id')
   async getUserById(@Param() dto: EntityIdDTO): Promise<UserEntity> {
     return await this.usersService.findById(dto.id);
+  }
+
+  @Post('/headman')
+  async saveHeadman(
+    @Body() dto: SaveHeadmanDTO,
+    @UserRequest() user: UserEntity,
+  ): Promise<UserEntity> {
+    return await this.usersService.createHeadman(dto, user);
   }
 
   @Get()
