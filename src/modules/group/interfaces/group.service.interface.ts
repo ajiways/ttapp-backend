@@ -6,7 +6,7 @@ import { UpdateGroupDTO } from '../dto/update-group.dto';
 import { GroupEntity } from '../entities/group.entity';
 import { GroupSchedule } from './schedule.interfaces';
 
-export type GroupList = Pick<GroupEntity, 'id' | 'title'>[];
+export type GroupList = Pick<GroupEntity, 'id' | 'title' | 'headmanId'>[];
 
 export interface GroupSeviceInterface
   extends BaseServiceInterface<GroupEntity> {
