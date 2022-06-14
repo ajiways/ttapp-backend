@@ -6,6 +6,7 @@ import {
   SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { keyBy } from 'lodash';
 import { EPermission } from '../../../common/enums/permissions';
 import { UserRolesServiceInterface } from '../../administration/interefaces/user-roles.service.interface';
 import { UserServiceInterface } from '../../administration/interefaces/user.service.interface';
@@ -55,14 +56,24 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
+    const requiredPermissionsCount = requiredPermissions.length;
+
     const userPermissions = await this.userRolesService.getUserPermissions(
       user,
     );
 
-    for (const permission of userPermissions) {
-      if (!requiredPermissions.includes(permission.type)) {
-        return false;
+    const userPermissionsByType = keyBy(userPermissions, ({ type }) => type);
+
+    let matchedPermissions = 0;
+
+    for (const permission of requiredPermissions) {
+      if (userPermissionsByType[permission]) {
+        matchedPermissions++;
       }
+    }
+
+    if (matchedPermissions !== requiredPermissionsCount) {
+      return false;
     }
 
     return true;
