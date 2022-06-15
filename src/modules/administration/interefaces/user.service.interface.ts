@@ -2,6 +2,7 @@ import { EntityManager } from 'typeorm';
 import { BaseServiceInterface } from '../../../common/base-service.interface';
 import { SaveHeadmanDTO } from '../dto/create-headman.dto';
 import { CreateUserDTO } from '../dto/create-user.dto';
+import { UpdateSelfPasswordDTO } from '../dto/update-self-password.dto';
 import { UpdateUserDTO } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
 
@@ -41,4 +42,10 @@ export interface UserServiceInterface extends BaseServiceInterface<UserEntity> {
     id: string,
     manager?: EntityManager,
   ): Promise<UserEntity | undefined>;
+
+  updateSelfPassword(
+    dto: UpdateSelfPasswordDTO,
+    user: UserEntity,
+    manager?: EntityManager,
+  ): Promise<boolean>;
 }

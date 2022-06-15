@@ -4,13 +4,14 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { EntityManager } from 'typeorm';
 import { AbstractService } from '../../../common/services/abstract.service';
 import { GroupService } from '../../group/services/group.service';
 import { StudentGroupService } from '../../group/services/student-group.service';
 import { SaveHeadmanDTO } from '../dto/create-headman.dto';
 import { CreateUserDTO } from '../dto/create-user.dto';
+import { UpdateSelfPasswordDTO } from '../dto/update-self-password.dto';
 import { UpdateUserDTO } from '../dto/update-user.dto';
 import { UserEntity } from '../entities/user.entity';
 import { UserServiceInterface } from '../interefaces/user.service.interface';
@@ -225,5 +226,32 @@ export class UserService
     }
 
     return await this.findByIdOrNull(id, manager);
+  }
+
+  async updateSelfPassword(
+    dto: UpdateSelfPasswordDTO,
+    user: UserEntity,
+    manager: EntityManager | undefined,
+  ): Promise<boolean> {
+    if (!manager) {
+      return this.startTransaction((manager) =>
+        this.updateSelfPassword(dto, user, manager),
+      );
+    }
+
+    const passwordMatched = await compare(dto.oldPassword, user.password);
+
+    if (!passwordMatched) {
+      throw new BadRequestException(`Wrong password`);
+    }
+
+    const newHashedPassword = await hash(dto.newPassword, 7);
+
+    user.password = newHashedPassword;
+    user.editorId = user.id;
+
+    await this.updateEntity({ id: user.id }, user, manager);
+
+    return true;
   }
 }
