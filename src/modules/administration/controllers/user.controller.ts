@@ -29,6 +29,7 @@ export class UserController {
     return await this.usersService.findById(dto.id);
   }
 
+  @RequirePermissions([EPermission.USER_CREATE])
   @Post('/headman')
   async saveHeadman(
     @Body() dto: SaveHeadmanDTO,
