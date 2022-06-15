@@ -79,4 +79,13 @@ export class UserController {
   ): Promise<boolean> {
     return await this.usersService.updateSelfPassword(dto, user);
   }
+
+  @RequirePermissions([EPermission.USER_CREATE])
+  @Post('/self/group')
+  async updateSelfGroup(
+    @Body() dto: EntityIdDTO,
+    @UserRequest() user: UserEntity,
+  ): Promise<boolean> {
+    return await this.usersService.updateSelfGroup(dto, user);
+  }
 }

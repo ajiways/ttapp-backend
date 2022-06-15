@@ -3,9 +3,11 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { compare, hash } from 'bcrypt';
 import { EntityManager } from 'typeorm';
+import { EntityIdDTO } from '../../../common/helpers/entity/entity-id.dto';
 import { AbstractService } from '../../../common/services/abstract.service';
 import { GroupService } from '../../group/services/group.service';
 import { StudentGroupService } from '../../group/services/student-group.service';
@@ -249,6 +251,41 @@ export class UserService
 
     user.password = newHashedPassword;
     user.editorId = user.id;
+
+    await this.updateEntity({ id: user.id }, user, manager);
+
+    return true;
+  }
+
+  async updateSelfGroup(
+    dto: EntityIdDTO,
+    user: UserEntity,
+    manager: EntityManager | undefined,
+  ): Promise<boolean> {
+    if (!manager) {
+      return this.startTransaction((manager) =>
+        this.updateSelfGroup(dto, user, manager),
+      );
+    }
+
+    const newGroup = await this.groupService.findById(dto.id, manager);
+    const studentGroup = await this.studentGroupService.findOneWhere(
+      { studentId: user.id },
+      manager,
+    );
+
+    if (!studentGroup) {
+      throw new InternalServerErrorException(`No student group for this user`);
+    }
+
+    user.groupId = newGroup.id;
+    studentGroup.groupId = newGroup.id;
+
+    await this.studentGroupService.updateEntity(
+      { studentId: user.id },
+      studentGroup,
+      manager,
+    );
 
     await this.updateEntity({ id: user.id }, user, manager);
 
