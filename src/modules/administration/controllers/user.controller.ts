@@ -18,6 +18,7 @@ import { UserRequest } from '../../../common/user-request';
 import { RequirePermissions } from '../../authentication/guards/roles.guard';
 import { EPermission } from '../../../common/enums/permissions';
 import { SaveHeadmanDTO } from '../dto/create-headman.dto';
+import { UpdateSelfPasswordDTO } from '../dto/update-self-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -68,5 +69,23 @@ export class UserController {
     @UserRequest() user: UserEntity,
   ): Promise<UserEntity> {
     return await this.usersService.save(dto, undefined, user);
+  }
+
+  @RequirePermissions([EPermission.USER_SELF_UPDATE])
+  @Post('/self/password')
+  async updateSelfPassword(
+    @Body() dto: UpdateSelfPasswordDTO,
+    @UserRequest() user: UserEntity,
+  ): Promise<boolean> {
+    return await this.usersService.updateSelfPassword(dto, user);
+  }
+
+  @RequirePermissions([EPermission.USER_SELF_UPDATE])
+  @Post('/self/group')
+  async updateSelfGroup(
+    @Body() dto: EntityIdDTO,
+    @UserRequest() user: UserEntity,
+  ): Promise<boolean> {
+    return await this.usersService.updateSelfGroup(dto, user);
   }
 }
