@@ -71,7 +71,7 @@ export class UserController {
     return await this.usersService.save(dto, undefined, user);
   }
 
-  @RequirePermissions([EPermission.USER_CREATE])
+  @RequirePermissions([EPermission.USER_SELF_UPDATE])
   @Post('/self/password')
   async updateSelfPassword(
     @Body() dto: UpdateSelfPasswordDTO,
@@ -80,7 +80,7 @@ export class UserController {
     return await this.usersService.updateSelfPassword(dto, user);
   }
 
-  @RequirePermissions([EPermission.USER_CREATE])
+  @RequirePermissions([EPermission.USER_SELF_UPDATE])
   @Post('/self/group')
   async updateSelfGroup(
     @Body() dto: EntityIdDTO,
