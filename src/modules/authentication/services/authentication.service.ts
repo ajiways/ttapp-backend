@@ -150,8 +150,6 @@ export class AuthenticationService implements AuthenticationServiceInterface {
       throw new InternalServerErrorException('No base student role was found');
     }
 
-    await this.userRolesService.save(user.id, studentRole.id);
-
     return {
       ...tokenData,
       groupId: user.groupId,
