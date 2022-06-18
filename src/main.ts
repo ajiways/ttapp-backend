@@ -7,7 +7,13 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(MainModule);
   const config: ConfigurationService = app.get(ConfigurationService);
-  app.enableCors({ origin: config.env.FRONTEND_URL, credentials: true });
+  app.enableCors({
+    origin:
+      config.env.STAGE === 'DEV'
+        ? config.env.FRONTEND_DEV_URL
+        : config.env.FRONTEND_URL,
+    credentials: true,
+  });
   app.use(cookieParser());
 
   app.useGlobalGuards(app.get('AuthenticationGuard'), app.get('RolesGuard'));
