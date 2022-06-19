@@ -50,6 +50,12 @@ export class EnvironmentConfig {
 
   @IsString()
   FRONTEND_DEV_URL!: string;
+
+  @IsString()
+  V2_FRONTEND_URL!: string;
+
+  @IsString()
+  V2_FRONTEND_DEV_URL!: string;
 }
 
 export default registerAs('env', function (): EnvironmentConfig {

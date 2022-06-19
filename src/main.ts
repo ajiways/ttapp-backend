@@ -7,11 +7,24 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(MainModule);
   const config: ConfigurationService = app.get(ConfigurationService);
+
+  const whitelist = [
+    config.env.STAGE === 'DEV'
+      ? config.env.FRONTEND_DEV_URL
+      : config.env.FRONTEND_URL,
+    config.env.STAGE === 'DEV'
+      ? config.env.V2_FRONTEND_DEV_URL
+      : config.env.V2_FRONTEND_URL,
+  ];
+
   app.enableCors({
-    origin:
-      config.env.STAGE === 'DEV'
-        ? config.env.FRONTEND_DEV_URL
-        : config.env.FRONTEND_URL,
+    origin: function (origin, callback) {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   });
   app.use(cookieParser());
