@@ -35,6 +35,8 @@ services:
       - STAGE=${STAGE}
       - FRONTEND_URL=${FRONTEND_URL}
       - FRONTEND_DEV_URL=${FRONTEND_DEV_URL}
+      - V2_FRONTEND_DEV_URL=${V2_FRONTEND_DEV_URL}
+      - V2_FRONTEND_URL=${V2_FRONTEND_URL}
     ports:
       - '3052:${APP_PORT}'
     depends_on:
