@@ -1,5 +1,7 @@
 # TimeTable app
 
+Api url: https://api.timetable-app.ru
+
 ## Do not forget to create .env file
 
 ## Backend trello: [_click_](https://trello.com/b/6U41WnlW/timetable-backend)
